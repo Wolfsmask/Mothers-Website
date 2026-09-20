@@ -52,7 +52,7 @@ except ImportError:
 
 ROOT = Path(__file__).resolve().parent.parent
 RAW_DIR = ROOT / "images" / "raw"
-OUT_DIR = ROOT / "images" / "products"
+OUT_DIR = ROOT / "assets" / "gallery"
 
 EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif", ".tif", ".tiff", ".bmp"}
 
@@ -389,7 +389,7 @@ def main() -> int:
     parser.add_argument("--in", dest="in_dir", default=str(RAW_DIR),
                         help="folder of raw photos (default: images/raw)")
     parser.add_argument("--out", dest="out_dir", default=str(OUT_DIR),
-                        help="where to write (default: images/products)")
+                        help="where to write (default: assets/gallery)")
     parser.add_argument("--bg", type=parse_colour, default="#ffffff",
                         help="backdrop colour, e.g. '#f2ede6' (default: white)")
     parser.add_argument("--sizes", type=int, nargs="+", default=DEFAULT_SIZES,
@@ -483,11 +483,11 @@ def main() -> int:
     print(f"\nDone: {ok} processed, {failed} failed.")
 
     if entries and not args.dry_run:
-        print("\nAdd these to window.PRODUCTS in data/site-data.js "
-              '(the "image" field takes the name without an extension):\n')
+        rel = out_dir.relative_to(ROOT).as_posix() if out_dir.is_relative_to(ROOT) else out_dir.as_posix()
+        print("\nAdd these to the gallery list in assets/site-config.js, and "
+              "replace each alt text with a real description of the photo:\n")
         for base in entries:
-            print(f'    {{ id: "{base}", name: "", image: "{base}", price: null, '
-                  f'status: "available", blurb: "", description: "", details: [] }},')
+            print(f'    {{ src: "{rel}/{base}.webp", alt: "" }},')
 
     return 1 if failed and not ok else 0
 

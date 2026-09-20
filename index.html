@@ -1,65 +1,283 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{name}}</title>
-<meta name="description" content="REPLACE ME — one sentence describing the business, for Google results.">
-<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="css/styles.css">
-</head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="theme-color" content="#15130f">
+      <title>Untamed Entertainment LC | Liberty & Kansas City Event Services</title>
+      <meta name="description" content="Untamed Entertainment LC provides event coordination, bartending labor, setup, staffing, rentals and entertainment in Liberty and the Kansas City area.">
+      <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+      <link rel="stylesheet" href="assets/site.css">
+      <script src="assets/site-config.js" defer></script>
+      <script src="assets/site.js" defer></script>
+      <script type="application/ld+json">
+      {
+        "@context":"https://schema.org",
+        "@type":"LocalBusiness",
+        "name":"Untamed Entertainment LC",
+        "description":"Event planning, coordination, setup, staffing, bartending labor, rentals and event entertainment serving Liberty and the Kansas City area.",
+        "areaServed":[
+          {"@type":"City","name":"Liberty","addressRegion":"MO"},
+          {"@type":"City","name":"Kansas City","addressRegion":"MO"}
+        ]
+      }
+      </script>
+    </head>
 <body>
-<a class="skip-link" href="#main">Skip to content</a>
-
 <header class="site-header">
-  <div class="wrap site-header__inner">
-    <a class="brand" href="index.html" data-site-name>Company Name</a>
-    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
-    <nav class="nav" id="primary-nav" aria-label="Primary">
-      <a href="index.html">Home</a>
-      <a href="shop.html">Shop</a>
-      <a href="about.html">About</a>
-      <a href="contact.html">Contact</a>
-    </nav>
+      <div class="container nav">
+        <a class="brand" href="index.html" aria-label="Untamed Entertainment LC home">
+      <img src="assets/sunflower.svg" alt="" width="50" height="50">
+      <div>
+        <div class="brand-word">Untamed</div>
+        <div class="brand-sub">Entertainment • LC</div>
+      </div>
+    </a>
+        <button class="menu-button" data-menu-button aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+        <nav aria-label="Main navigation">
+          <ul class="nav-links" data-nav-links>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="weddings.html">Weddings</a></li>
+            <li><a href="rentals.html">Rentals</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="index.html#faq">FAQ</a></li>
+            <li data-contact-nav><a class="button gold" href="index.html#contact">Plan Your Event →</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+<main>
+
+<section class="hero" id="home">
+  <div class="container hero-grid">
+    <div class="hero-copy reveal">
+      <div class="eyebrow">Liberty + Kansas City Event Experience Company</div>
+      <h1>Your Event.<br>Less Stress.<span class="script">More Fun.</span></h1>
+      <p>Untamed Entertainment LC helps take the little things, the last-minute things, and the “who's handling that?” things off your plate so you can actually enjoy your event.</p>
+      <div class="hero-actions">
+        <a class="button gold" href="#contact">Start Planning →</a>
+        <a class="button outline" href="services.html">Explore Services</a>
+      </div>
+      <div class="hero-tags">
+        <span class="hero-tag"><i>♥</i> Weddings</span>
+        <span class="hero-tag"><i>✦</i> Parties</span>
+        <span class="hero-tag"><i>◇</i> Private Events</span>
+        <span class="hero-tag"><i>★</i> Themed Experiences</span>
+      </div>
+    </div>
+    <div class="portrait-wrap reveal">
+      <div class="portrait">
+        <picture>
+          <source srcset="assets/owner-hero-480.webp 480w, assets/owner-hero-720.webp 720w, assets/owner-hero-960.webp 960w" sizes="(max-width: 820px) 92vw, 44vw" type="image/webp">
+          <img src="assets/owner-hero-720.webp" width="720" height="960" alt="Owner of Untamed Entertainment LC" fetchpriority="high" decoding="async">
+        </picture>
+      </div>
+      <div class="hero-note">You enjoy it. We handle it. ♥</div>
+    </div>
   </div>
-</header>
+</section>
 
-<main id="main">
-
-  <section class="hero">
-    <div class="wrap">
-      <h1 data-site-name>Company Name</h1>
-      <p class="hero__tagline" data-site-tagline>Tagline goes here.</p>
-      <p class="hero__intro" data-site-intro>Introduction goes here.</p>
-      <div class="btn-row">
-        <a class="btn" href="shop.html">Browse the shop</a>
-        <a class="btn btn--ghost" href="contact.html">Get in touch</a>
+<section class="local-strip">
+  <div class="local-grid">
+    <div class="local-copy reveal">
+      <div class="eyebrow">Local Event Support</div>
+      <h2>Based in Liberty. Built for Kansas City celebrations.</h2>
+      <p>Untamed Entertainment LC serves clients in Liberty and the Kansas City area with flexible event support—from one specific job to hands-on help keeping the whole experience moving.</p>
+    </div>
+    <div class="local-badge reveal">
+      <div>
+        <strong>Liberty, Missouri</strong>
+        <span>Serving the Kansas City Area</span>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section class="section section--alt">
-    <div class="wrap">
-      <h2>Featured</h2>
-      <p class="section__lead">A few favourites. See everything in the shop.</p>
-      <div id="featured-grid"></div>
-      <div class="btn-row" style="margin-top:32px">
-        <a class="btn btn--ghost" href="shop.html">See all items</a>
+<section class="section services" id="services">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="eyebrow">What We Do</div>
+      <h2 class="title">Event Help That Actually Helps.</h2>
+      <p class="lead">Book one focused service or build a broader support plan around what would make your event easier.</p>
+    </div>
+    <div class="services-grid">
+      <article class="service-card reveal"><div class="service-icon">▣</div><h3>Planning & Coordination</h3><p>Timelines, vendor coordination, day-of management and a calm point person keeping the moving pieces connected.</p><a class="card-link" href="coordination.html">Explore coordination →</a></article>
+      <article class="service-card reveal"><div class="service-icon">♨</div><h3>Bartending Labor</h3><p>Professional bar support when the client or venue supplies the beverages, plus beverage-station setup and guest service.</p><a class="card-link" href="bartending.html">Explore bartending →</a></article>
+      <article class="service-card reveal"><div class="service-icon">⌂</div><h3>Setup & Teardown</h3><p>Tables, décor, linens, event areas and the details that need to be ready before guests arrive—and handled after they leave.</p><a class="card-link" href="services.html#setup">See event support →</a></article>
+      <article class="service-card reveal"><div class="service-icon">☻</div><h3>Party & Character Entertainment</h3><p>Themed characters, crowd interaction, games, hosting and specialty experiences that give the event personality.</p><a class="card-link" href="entertainment.html">Explore entertainment →</a></article>
+      <article class="service-card reveal"><div class="service-icon">▱</div><h3>Rentals</h3><p>Tables, chairs, linens, backdrops, décor and small party equipment, with delivery, pickup and setup options as available.</p><a class="card-link" href="rentals.html">Browse rental categories →</a></article>
+      <article class="service-card reveal"><div class="service-icon">♡</div><h3>Wedding Reception Support</h3><p>Guest assistance, vendor check-ins, timeline help, setup/cleanup and flexible support throughout the reception.</p><a class="card-link" href="weddings.html">Explore wedding support →</a></article>
+    </div>
+  </div>
+</section>
+
+<section class="section trust">
+  <div class="container trust-grid">
+    <div class="quote-card reveal">
+      <blockquote>“I don't want to deal with <strong>that shit</strong> at my event.”</blockquote>
+      <p>That is the whole point. You should not spend your own celebration working it.</p>
+    </div>
+    <div class="trust-copy reveal">
+      <div class="eyebrow">The Untamed Difference</div>
+      <h2>You Should Feel Better The Moment We Show Up.</h2>
+      <p>The best event support is the calm feeling that someone capable is paying attention, knows what needs to happen next, and is ready to handle the little problems before they become your problems.</p>
+      <div class="trust-points">
+        <div class="trust-point"><strong>Clear communication</strong><span>Know what is included, what is happening, and what to expect before event day.</span></div>
+        <div class="trust-point"><strong>Calm under pressure</strong><span>When plans shift, the goal is to solve the problem without handing the stress back to you.</span></div>
+        <div class="trust-point"><strong>Eyes on the details</strong><span>Guests, vendors, setup, timing and the little things all get real attention.</span></div>
+        <div class="trust-point"><strong>Your event stays yours</strong><span>Good support makes the experience smoother without taking it over.</span></div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
+
+<section class="section about" id="about">
+  <div class="container about-grid">
+    <div class="about-photo reveal">
+      <picture>
+        <source srcset="assets/owner-about-480.webp 480w, assets/owner-about-720.webp 720w, assets/owner-about-960.webp 960w" sizes="(max-width:1000px) 92vw, 38vw" type="image/webp">
+        <img src="assets/owner-about-720.webp" width="720" height="900" alt="Owner of Untamed Entertainment LC" loading="lazy" decoding="async">
+      </picture>
+    </div>
+    <div class="about-copy reveal">
+      <div class="eyebrow">Meet Untamed</div>
+      <h2>A Real Person In Your Corner When The Event Gets Busy.</h2>
+      <p>Untamed Entertainment LC is built around a simple idea: hosts should be able to enjoy the events they worked so hard to create. From coordinating timelines and greeting vendors to setup, guest assistance, bartending and the unexpected little problems, the job is to help carry the load.</p>
+      <p>You should never feel like you hired someone and still have to manage them. The goal is to arrive prepared, communicate clearly, notice what needs attention and make the whole experience feel easier for you and your guests.</p>
+      <a class="button dark" href="about.html">Meet Untamed →</a>
+    </div>
+  </div>
+</section>
+
+<section class="section" data-pricing hidden>
+  <div class="container">
+    <div class="section-head"><div class="eyebrow">Starting Prices</div><h2 class="title">Clear Pricing, No Guessing.</h2><p class="lead">Only finalized, real starting prices are shown here.</p></div>
+    <div class="pricing-grid" data-pricing-grid></div>
+  </div>
+</section>
+
+<section class="section" data-testimonials hidden>
+  <div class="container">
+    <div class="section-head"><div class="eyebrow">Client Experiences</div><h2 class="title">What People Say After The Event.</h2></div>
+    <div class="testimonial-grid" data-testimonial-grid></div>
+    <div style="text-align:center;margin-top:24px"><a class="button dark" data-google-review href="#" hidden>Read More Google Reviews →</a></div>
+  </div>
+</section>
+
+<section class="section" id="faq">
+  <div class="container faq-grid">
+    <div class="reveal">
+      <div class="eyebrow">FAQ</div>
+      <h2 class="title">Before You Ask.</h2>
+      <p class="lead">A few of the questions clients are likely to have before reaching out.</p>
+    </div>
+    <div class="faq-list reveal">
+      <div class="faq-item"><button class="faq-question" aria-expanded="false"><span>What kinds of events does Untamed help with?</span><span>+</span></button><div class="faq-answer"><div><p>Weddings, receptions, birthday parties, private events, themed events and other celebrations where planning, staffing, setup, bartending labor, rentals or hands-on event assistance would help.</p></div></div></div>
+      <div class="faq-item"><button class="faq-question" aria-expanded="false"><span>Can I book just one service?</span><span>+</span></button><div class="faq-answer"><div><p>Yes. The goal is to build support around the event rather than force every client into one giant package.</p></div></div></div>
+      <div class="faq-item"><button class="faq-question" aria-expanded="false"><span>Does Untamed sell alcohol?</span><span>+</span></button><div class="faq-answer"><div><p>Bartending is positioned as labor/service when the client or venue supplies the beverages. Any future alcohol sales would only be offered if all required licensing, venue rules and insurance requirements are satisfied.</p></div></div></div>
+      <div class="faq-item"><button class="faq-question" aria-expanded="false"><span>Where do you serve?</span><span>+</span></button><div class="faq-answer"><div><p>Untamed is positioned as a Liberty, Missouri business serving Liberty and the Kansas City area. Final travel boundaries can be confirmed when you request availability.</p></div></div></div>
+      <div class="faq-item"><button class="faq-question" aria-expanded="false"><span>Do you offer rentals?</span><span>+</span></button><div class="faq-answer"><div><p>Rental categories include tables, chairs, linens, backdrops, décor and small party equipment. Exact inventory and availability can vary by event date.</p></div></div></div>
+      <div class="faq-item"><button class="faq-question" aria-expanded="false"><span>Can you help with food service?</span><span>+</span></button><div class="faq-answer"><div><p>Catering coordination, food-service staffing and buffet setup can be discussed. Food preparation or sales should only be offered when all required permits and licensing are in place.</p></div></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" data-gallery hidden>
+  <div class="container">
+    <div class="section-head"><div class="eyebrow">Real Events</div><h2 class="title">The Untamed Gallery.</h2><p class="lead">Only approved, real event photography is displayed.</p></div>
+    <div class="gallery-grid" data-gallery-grid></div>
+  </div>
+</section>
+
+<section class="section contact" id="contact" data-contact-section>
+  <div class="container">
+    <div class="contact-card reveal">
+      <div class="contact-copy">
+        <div class="eyebrow">Let's Talk</div>
+        <h2>What's Your Event?</h2>
+        <p>Tell us what you're planning, where it is and what you would love to stop worrying about.</p>
+        <div class="contact-lines">
+          <div class="contact-line"><i>⌖</i><span class="copyable">Based in Liberty, Missouri • Serving Liberty and the Kansas City area</span></div>
+          <div class="contact-line" data-optional-contact><i>✉</i><a class="copyable" data-business-email></a></div>
+          <div class="contact-line" data-optional-contact><i>☎</i><a class="copyable" data-business-phone></a></div>
+        </div>
+        <p data-contact-pending hidden><strong>Before publishing:</strong> add the real business email and/or phone number in <code>assets/site-config.js</code>. No fake contact details are displayed.</p>
+      </div>
+      <form class="contact-form" data-inquiry-form>
+        <div class="form-row">
+          <label class="visually-hidden" for="name">Your name</label>
+          <input id="name" name="name" type="text" placeholder="Your Name" autocomplete="name" required>
+          <label class="visually-hidden" for="email">Your email</label>
+          <input id="email" name="email" type="email" placeholder="Your Email" autocomplete="email" required>
+        </div>
+        <div class="form-row">
+          <label class="visually-hidden" for="eventDate">Event date</label>
+          <input id="eventDate" name="eventDate" type="date">
+          <label class="visually-hidden" for="location">Event location</label>
+          <input id="location" name="location" type="text" placeholder="Event Location">
+        </div>
+        <div class="form-row">
+          <label class="visually-hidden" for="eventType">What are you planning?</label>
+          <select id="eventType" name="eventType" required><option value="">What are you planning?</option><option>Wedding</option><option>Wedding Reception</option><option>Birthday Party</option><option>Private Party</option><option>Themed Event</option><option>Corporate / Business Event</option><option>Other Event</option></select>
+          <label class="visually-hidden" for="service">What do you need help with?</label>
+          <select id="service" name="service"><option value="">What do you need help with?</option><option>Planning / Coordination</option><option>Wedding Reception Assistance</option><option>Bartending Labor</option><option>Setup / Teardown</option><option>Event Staffing</option><option>Party Hosting</option><option>Character Entertainment</option><option>Décor Styling</option><option>Rentals</option><option>I'm not sure yet</option></select>
+        </div>
+        <label class="visually-hidden" for="message">Tell us about the event</label>
+        <textarea id="message" name="message" placeholder="Tell us about the event, estimated guest count, and what you want taken off your plate..."></textarea>
+        <button class="submit" type="submit">Send Event Inquiry →</button>
+        <p class="form-note">Uses the real business email configured for the site.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
 </main>
-
-<footer class="site-footer">
-  <div class="wrap site-footer__inner">
-    <span>&copy; <span id="year">2026</span> <span data-site-name>Company Name</span>. All rights reserved.</span>
-    <span class="site-footer__links">
-      <a href="contact.html">Contact</a>
-    </span>
-  </div>
-</footer>
-
-<script src="data/site-data.js"></script>
-<script src="js/main.js"></script>
+<footer>
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-brand">
+            <a class="brand" href="index.html" aria-label="Untamed Entertainment LC home">
+      <img src="assets/sunflower.svg" alt="" width="50" height="50">
+      <div>
+        <div class="brand-word">Untamed</div>
+        <div class="brand-sub">Entertainment • LC</div>
+      </div>
+    </a>
+            <p class="footer-copy">A Liberty, Missouri event experience company helping weddings, parties and private events feel smoother, calmer and more enjoyable.</p>
+            <div class="social-links">
+              <a class="social-link" data-social="facebook" href="#" hidden>f</a>
+              <a class="social-link" data-social="instagram" href="#" hidden>ig</a>
+              <a class="social-link" data-social="pinterest" href="#" hidden>p</a>
+              <a class="social-link" data-social="googleBusinessProfile" href="#" hidden>G</a>
+            </div>
+          </div>
+          <div>
+            <div class="footer-title">Explore</div>
+            <div class="footer-links">
+              <a href="services.html">Services</a>
+              <a href="weddings.html">Weddings</a>
+              <a href="bartending.html">Bartending</a>
+              <a href="coordination.html">Coordination</a>
+              <a href="entertainment.html">Entertainment</a>
+              <a href="rentals.html">Rentals</a>
+            </div>
+          </div>
+          <div>
+            <div class="footer-title">Company</div>
+            <div class="footer-links">
+              <a href="about.html">About</a>
+              <a href="index.html#faq">FAQ</a>
+              <a href="gallery.html">Gallery</a>
+              <a href="privacy.html">Privacy</a>
+              <a href="terms.html">Terms</a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <span>© <span data-year></span> Untamed Entertainment LC. All rights reserved.</span>
+          <span>Based in Liberty, Missouri • Serving Liberty + Kansas City area</span>
+        </div>
+      </div>
+    </footer>
 </body>
 </html>

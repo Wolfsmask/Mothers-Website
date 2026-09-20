@@ -1,70 +1,53 @@
-# Website
+# Untamed Entertainment LC — website
 
-A small static website: four pages, no build step, no frameworks. Open
-`index.html` in a browser and it works. Anyone can host it for free.
+A static multi-page site. No build step and no dependencies: the pages open
+straight from disk and can be hosted free on any static host.
 
----
-
-## 1. Edit the words and the products
-
-Everything you would want to change lives in **one file**:
-
-    data/site-data.js
-
-Open it in any text editor. The top half is the business name, tagline,
-about text and contact details. The bottom half is the list of products.
-Save the file, refresh the page in the browser, and the change is there.
-
-Anything still saying `REPLACE ME` has not been filled in yet.
-
-If prices should not be in US dollars, change the `currency` line near the
-top to `"GBP"`, `"EUR"`, `"CAD"`, `"AUD"` or whichever applies — the prices
-stay plain numbers and the right symbol is added for you.
-
-To add a product, copy one block and change the values:
-
-```js
-{
-  id: "lavender-candle",       // must be unique
-  name: "Lavender Candle",
-  image: "lavender-candle",    // file name from images/products/, no extension
-  price: 18.00,                // or null to show "Enquire for price"
-  status: "available",         // "available" | "sold" | "made-to-order"
-  blurb: "Hand poured, burns about 40 hours.",
-  description: "The longer text shown when someone opens the item.",
-  details: ["Soy wax", "220ml", "Burn time ~40 hours"]
-},
-```
-
-Commas matter: every block needs a comma after its closing `}` except the
-last one. If the page ever goes blank, that is almost always the cause —
-press F12 in the browser and the console will name the line.
+- `README.txt` — how to open the site locally in VS Code.
+- `NEXT-STEPS.md` — the launch checklist and what real information is still
+  needed before going live.
+- This file — how to edit content, and how to prepare photos.
 
 ---
 
-## 2. Turn the raw photos into product photos
+## Editing content
 
-Put the original photos — straight off a phone is fine — into:
+Almost everything that needs real information lives in **one file**:
 
-    images/raw/
+    assets/site-config.js
 
-Then run, from this folder:
+Business name, owner name, email, phone, social links, the Google Analytics
+ID, testimonials, starting prices and the gallery all come from there. The
+site deliberately **hides anything left blank** rather than showing a
+placeholder — so an empty `instagram` means no Instagram link appears, and
+an empty `testimonials` list means the whole testimonials section is gone.
+Fill a value in and the section appears by itself.
+
+Page wording lives in the `.html` files directly.
+
+---
+
+## Adding photos
+
+Put the original photos — straight off a phone is fine — into `images/raw/`,
+then run from this folder:
 
     pip install Pillow numpy pillow-heif
     python3 scripts/process_photos.py
 
-For each photo it corrects the rotation, removes a plain background,
-crops to the item, fixes the colour cast, and places it centred on a
-square white backdrop with a soft shadow. It writes web-sized `.jpg` and
-`.webp` files into `images/products/` and then prints the product blocks
-ready to paste into `data/site-data.js`.
+For each photo it corrects the rotation, removes a plain background, crops to
+the item, fixes the colour cast, and places it centred on a square backdrop
+with a soft shadow. It writes web-sized `.webp` and `.jpg` into
+`assets/gallery/`, then prints gallery entries ready to paste into
+`assets/site-config.js`. Replace each blank `alt` with a real description of
+the photo — that text is what a blind visitor hears, and what Google reads.
 
 Useful options:
 
 | Option | What it does |
 | --- | --- |
 | `--dry-run` | Report what it would do, write nothing |
-| `--bg "#f2ede6"` | Use a different backdrop colour instead of white |
+| `--bg "#f7eee1"` | Backdrop colour (the site's cream, instead of white) |
 | `--no-knockout` | Keep the original background |
 | `--force-knockout` | Remove the background even if the backdrop looks busy |
 | `--no-shadow` | No drop shadow |
@@ -74,92 +57,53 @@ Useful options:
 ### Getting good results
 
 The script decides for itself whether the background is plain enough to
-remove, and leaves the photo alone when it is not — a kept background is
-better than a damaged item. So the photos that come out best are:
+remove, and leaves the photo alone when it is not — a kept background beats a
+damaged item. Photos that come out best are:
 
-- Shot against something plain: a sheet, a wall, a large piece of paper.
-  It handles a backdrop that is brighter at one end than the other.
-- Lit by a window rather than by the overhead light.
-- Taken reasonably close. If it says `low detail (4.9x enlarged)`, the
-  item was small in the frame and the result will look soft — step closer
-  and reshoot.
-- Not the same colour as the backdrop. A white mug on a white sheet has
-  no edge to find; use a grey or coloured background for it.
+- Shot against something plain: a sheet, a wall, a large piece of paper. A
+  backdrop that is brighter at one end than the other is fine.
+- Lit by a window rather than the overhead light.
+- Taken reasonably close. If it reports `low detail (4.9x enlarged)`, the item
+  was small in the frame and will look soft — step closer and reshoot.
+- Not the same colour as the backdrop. A white vase on a white sheet has no
+  edge to find; use a coloured background for it.
 
-If one photo comes out wrong, fix that photo on its own:
-
-    python3 scripts/process_photos.py --in images/raw/just-this-one --tolerance 50
-
-`images/raw/` is deliberately excluded from git — the originals are large
-and only the processed versions are needed on the website. Keep the
-originals backed up somewhere.
+`images/raw/` is excluded from git — the originals are large and only the
+processed versions are needed. Keep the originals backed up somewhere.
 
 ---
 
-## 3. Make the contact form actually send
+## Hosting
 
-Out of the box the form opens the visitor's own email app with the
-message filled in. That works everywhere and needs no account, but the
-visitor has to press send themselves.
-
-To have messages arrive by email directly, sign up for a free form
-service (Formspree, Web3Forms and Basin all have free tiers), and put the
-address it gives you into `data/site-data.js`:
-
-```js
-formEndpoint: "https://formspree.io/f/xxxxxxxx",
-```
-
-The form posts there and shows a thank-you message. If the service is
-ever down it falls back to showing the email address.
-
----
-
-## 4. Put it online
-
-The files are plain HTML — any static host will do, all of these free:
+The files are plain HTML, so any static host works, all free:
 
 - **Netlify** or **Vercel** — drag the folder onto their dashboard.
-- **GitHub Pages** — in the repository, Settings → Pages → deploy from
-  the `main` branch. The site appears at `username.github.io/repo-name`.
+- **GitHub Pages** — Settings → Pages → deploy from the branch.
 - **Cloudflare Pages** — connect the repository, no build command.
 
-A custom domain (about $12/year) can be pointed at any of them.
+A custom domain (about $12/year) can be pointed at any of them. Once the
+domain is final, generate `sitemap.xml` with absolute URLs and add a
+`Sitemap:` line to `robots.txt` — see `NEXT-STEPS.md`.
 
 ---
-
-## Before it goes live
-
-- [ ] Replace every `REPLACE ME` in `data/site-data.js`
-- [ ] Replace the `<meta name="description">` line in each `.html` file
-- [ ] Replace `assets/favicon.svg` with a real logo
-- [ ] Check the site on a phone as well as a computer
-- [ ] If anything is actually sold online, or any personal data is
-      collected, check what your country requires — see the note below
-
-## A note on the legal side
-
-This repository does not include a privacy policy, terms of sale or
-returns policy, because what they must say depends on where the business
-is, what it sells and who it sells to. The contact form sends a name,
-an email address and a message, which in most places counts as personal
-data and needs at minimum a line saying what happens to it.
-
-If there is policy text already written, put it in a new `privacy.html`
-and `terms.html` alongside the other pages, and set `showPrivacy` and
-`showTerms` to `true` in `data/site-data.js`. For anything binding —
-refunds, liability, taxes on sales — it is worth a conversation with
-someone qualified in your jurisdiction rather than a template.
 
 ## File map
 
-    index.html            Home page
-    shop.html             All products
-    about.html            About
-    contact.html          Contact details and form
-    data/site-data.js     >>> all the text and products live here <<<
-    css/styles.css        Styling, colours at the very top
-    js/main.js            Page behaviour
+    index.html              Home, including the FAQ and inquiry form
+    services.html           Service overview
+    weddings.html           Wedding landing page
+    bartending.html         Bartending landing page
+    coordination.html       Coordination landing page
+    entertainment.html      Entertainment landing page
+    rentals.html            Rentals catalog
+    gallery.html            Gallery (hidden until real photos are added)
+    about.html              About
+    privacy.html            Privacy policy
+    terms.html              Terms
+    404.html                Not-found page
+    assets/site-config.js   >>> real business information goes here <<<
+    assets/site.css         Styling, colours at the very top
+    assets/site.js          Page behaviour
     scripts/process_photos.py   Photo processing
-    images/raw/           Put original photos here (not committed)
-    images/products/      Processed photos, written by the script
+    images/raw/             Put original photos here (not committed)
+    assets/gallery/         Processed photos, written by the script
