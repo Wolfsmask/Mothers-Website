@@ -1,0 +1,22 @@
+# OS noise
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node
+node_modules/
+
+# Raw, unprocessed source photos (large; keep locally, not in git)
+images/raw/*
+!images/raw/.gitkeep
