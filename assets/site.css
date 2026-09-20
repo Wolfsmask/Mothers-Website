@@ -218,6 +218,19 @@ button{cursor:pointer}
 .catalog-card h3{font-family:var(--serif);font-size:1.5rem;font-weight:500;margin:0 0 10px}
 .catalog-card p{color:var(--muted)}
 
+.catalog-card__blurb{color:var(--muted);margin:0 0 16px}
+.catalog-item-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.catalog-item{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;
+  column-gap:12px;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.catalog-item:last-child{border-bottom:0;padding-bottom:0}
+.catalog-item__photo{grid-row:1 / span 2;width:56px;height:56px;object-fit:cover;
+  border-radius:12px;background:var(--paper2)}
+.catalog-item__name{grid-column:2;font-weight:700;font-size:.97rem}
+/* With no photo the text spans both columns instead of leaving an empty gap. */
+.catalog-item:not(:has(.catalog-item__photo)) .catalog-item__name,
+.catalog-item:not(:has(.catalog-item__photo)) .catalog-item__detail{grid-column:1 / -1}
+.catalog-item__detail{grid-column:2;color:var(--muted);font-size:.87rem;line-height:1.45}
+.catalog-card{min-height:0}
 .gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .gallery-item{aspect-ratio:4/3;border-radius:18px;overflow:hidden;background:#eadbc7}
 .gallery-item img{width:100%;height:100%;object-fit:cover}

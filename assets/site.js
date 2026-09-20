@@ -184,6 +184,56 @@
     }
   }
 
+  // Rental catalog. Categories and items come from site-config.js so the
+  // inventory can be edited without touching HTML. An item with no photo
+  // renders as a plain text entry rather than a broken image, so the page
+  // stays presentable while photography is still being done.
+  const catalogSection = document.querySelector("[data-rentals]");
+  const catalogGrid = document.querySelector("[data-rentals-grid]");
+  if (catalogSection && catalogGrid) {
+    const groups = Array.isArray(cfg.rentals)
+      ? cfg.rentals.filter(g => g && !g.hidden && g.category && Array.isArray(g.items))
+      : [];
+
+    if (!groups.length) {
+      catalogSection.setAttribute("hidden", "");
+    } else {
+      catalogGrid.innerHTML = groups.map(group => {
+        const items = group.items.filter(i => i && !i.hidden && i.name);
+        if (!items.length) return "";
+
+        const rows = items.map(item => {
+          const photo = item.image
+            ? `<img class="catalog-item__photo" loading="lazy" decoding="async"
+                 src="assets/rentals/${escapeAttr(item.image)}.webp"
+                 alt="${escapeAttr(item.name)}">`
+            : "";
+          const detail = item.detail
+            ? `<span class="catalog-item__detail">${escapeHtml(item.detail)}</span>`
+            : "";
+          return `<li class="catalog-item">${photo}
+                    <span class="catalog-item__name">${escapeHtml(item.name)}</span>
+                    ${detail}
+                  </li>`;
+        }).join("");
+
+        const blurb = group.blurb
+          ? `<p class="catalog-card__blurb">${escapeHtml(group.blurb)}</p>`
+          : "";
+
+        return `<article class="catalog-card card reveal">
+                  <h3>${escapeHtml(group.category)}</h3>
+                  ${blurb}
+                  <ul class="catalog-item-list">${rows}</ul>
+                </article>`;
+      }).join("");
+
+      // Entries built after the observer was set up need registering too, or
+      // they stay stuck at the reveal animation's starting opacity.
+      catalogGrid.querySelectorAll(".reveal").forEach(el => el.classList.add("visible"));
+    }
+  }
+
   // Analytics loads only after a real Measurement ID is configured and the visitor opts in.
   if (cfg.gaMeasurementId) {
     const stored = readConsent();

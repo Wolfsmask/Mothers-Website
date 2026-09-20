@@ -27,6 +27,19 @@ Page wording lives in the `.html` files directly.
 
 ---
 
+## The rental catalog
+
+`rentals.html` builds itself from the `rentals` list in
+`assets/site-config.js`. Each category holds a list of items, and each item
+may name a photo. Items with no photo show as a clean text entry, so photos
+can be added a few at a time without the page ever looking half-finished.
+
+Set `hidden: true` on any item or category that is not currently for rent,
+rather than deleting it, so it can be brought back later.
+
+See `INVENTORY.md` for the full transcribed stock list and the readings that
+still need confirming, and `PHOTO-GUIDE.md` for how to shoot the photos.
+
 ## Adding photos
 
 Put the original photos — straight off a phone is fine — into `images/raw/`,
@@ -38,8 +51,9 @@ then run from this folder:
 For each photo it corrects the rotation, removes a plain background, crops to
 the item, fixes the colour cast, and places it centred on a square backdrop
 with a soft shadow. It writes web-sized `.webp` and `.jpg` into
-`assets/gallery/`, then prints gallery entries ready to paste into
-`assets/site-config.js`. Replace each blank `alt` with a real description of
+the chosen output folder, then prints entries ready to paste into
+`assets/site-config.js`. For catalog photos use
+`--out assets/rentals`; for event photos leave the default. Replace each blank `alt` with a real description of
 the photo — that text is what a blind visitor hears, and what Google reads.
 
 Useful options:
