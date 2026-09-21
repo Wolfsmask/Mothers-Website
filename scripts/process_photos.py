@@ -458,6 +458,120 @@ def correct_colour(img: Image.Image) -> Image.Image:
 
 
 # --------------------------------------------------------------------------
+# presentation
+# --------------------------------------------------------------------------
+
+def _convex_hull(points):
+    points = sorted(set(points))
+    if len(points) < 3:
+        return points
+
+    def cross(o, a, b):
+        return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+
+    lower = []
+    for pt in points:
+        while len(lower) >= 2 and cross(lower[-2], lower[-1], pt) <= 0:
+            lower.pop()
+        lower.append(pt)
+    upper = []
+    for pt in reversed(points):
+        while len(upper) >= 2 and cross(upper[-2], upper[-1], pt) <= 0:
+            upper.pop()
+        upper.append(pt)
+    return lower[:-1] + upper[:-1]
+
+
+def subject_angle(mask: Image.Image) -> float | None:
+    """
+    How far the item is rotated, from the tightest rectangle that contains it.
+
+    Returns None for anything that is not clearly rectangular -- a plate has no
+    meaningful angle, and rotating it would only lose resolution. A photo of
+    something square-ish shot at a slant is what this is for.
+    """
+    small = mask.resize((260, max(1, int(260 * mask.height / mask.width))), Image.NEAREST)
+    arr = np.asarray(small) > 32
+    if arr.sum() < 40:
+        return None
+
+    ys, xs = np.nonzero(arr)
+    hull = _convex_hull(list(zip(xs.tolist(), ys.tolist())))
+    if len(hull) < 3:
+        return None
+
+    pts = np.array(hull, dtype=np.float64)
+    best = None
+    for i in range(len(pts)):
+        edge = pts[(i + 1) % len(pts)] - pts[i]
+        length = float(np.hypot(*edge))
+        if length < 1e-6:
+            continue
+        theta = -np.arctan2(edge[1], edge[0])
+        rot = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
+        proj = pts @ rot.T
+        w = float(proj[:, 0].max() - proj[:, 0].min())
+        h = float(proj[:, 1].max() - proj[:, 1].min())
+        if best is None or w * h < best[0]:
+            best = (w * h, np.degrees(theta), w, h)
+
+    if best is None:
+        return None
+
+    area, degrees, w, h = best
+    # Only trust it when the item really does fill that rectangle.
+    if arr.sum() / max(area, 1) < 0.62:
+        return None
+
+    # Normalise to the smallest turn that levels it.
+    degrees = ((degrees + 45) % 90) - 45
+    return degrees if 0.8 <= abs(degrees) <= 25.0 else None
+
+
+def studio_backdrop(size: int, base: tuple[int, int, int]) -> Image.Image:
+    """
+    A seamless sweep rather than a flat fill: slightly brighter behind the
+    item, shading down toward the bottom, which is what a lit backdrop in a
+    photo studio actually looks like.
+    """
+    top = tuple(min(255, c + 6) for c in base)
+    bottom = tuple(max(0, c - 14) for c in base)
+    ramp = np.linspace(0.0, 1.0, size, dtype=np.float32)[:, None]
+    grad = (np.array(top, np.float32) * (1 - ramp) + np.array(bottom, np.float32) * ramp)
+    canvas = np.repeat(grad[:, None, :], size, axis=1)
+
+    # A soft pool of light behind where the item sits.
+    yy, xx = np.mgrid[0:size, 0:size].astype(np.float32)
+    r = np.hypot((xx - size / 2) / (size * 0.62), (yy - size * 0.42) / (size * 0.62))
+    canvas += (np.clip(1.0 - r, 0, 1) ** 2)[:, :, None] * 9.0
+    return Image.fromarray(np.clip(canvas, 0, 255).astype(np.uint8), mode="RGB")
+
+
+def contact_shadow(size: int, mask: Image.Image, x: int, y: int) -> Image.Image:
+    """
+    An elliptical pool of shadow under the item, as if it were standing on the
+    backdrop. Reads as grounded, where a blurred copy of the silhouette reads
+    as a sticker with a drop shadow.
+    """
+    arr = np.asarray(mask) > 32
+    if not arr.any():
+        return Image.new("L", (size, size), 0)
+
+    ys, xs = np.nonzero(arr)
+    left, right = int(xs.min()) + x, int(xs.max()) + x
+    base = int(ys.max()) + y
+    width = max(8, right - left)
+
+    shadow = Image.new("L", (size, size), 0)
+    ImageDraw.Draw(shadow).ellipse(
+        [left + width * 0.06, base - width * 0.055,
+         right - width * 0.06, base + width * 0.075],
+        fill=118,
+    )
+    return shadow.filter(ImageFilter.GaussianBlur(max(6, size // 55)))
+
+
+# --------------------------------------------------------------------------
 # framing
 # --------------------------------------------------------------------------
 
@@ -482,9 +596,11 @@ def compose_square(
     bg_colour: tuple[int, int, int],
     padding: float,
     shadow: bool,
+    studio: bool = False,
 ) -> Image.Image:
     """Centre the item on a square backdrop, with an optional soft shadow."""
-    canvas = Image.new("RGB", (size, size), bg_colour)
+    canvas = (studio_backdrop(size, bg_colour) if studio
+              else Image.new("RGB", (size, size), bg_colour))
 
     inner = max(1, int(size * (1.0 - 2.0 * padding)))
 
@@ -502,14 +618,16 @@ def compose_square(
     y = (size - fitted.height) // 2
 
     if shadow and fitted_mask is not None:
-        blur = max(3, size // 90)
-        offset = max(2, size // 110)
-
-        shadow_layer = Image.new("L", (size, size), 0)
-        shadow_layer.paste(fitted_mask, (x, y + offset))
-        shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(blur))
-        # Keep it subtle — a heavy shadow reads as a cut-out, not a photo.
-        shadow_layer = shadow_layer.point(lambda v: int(v * 0.35))
+        if studio:
+            shadow_layer = contact_shadow(size, fitted_mask, x, y)
+        else:
+            blur = max(3, size // 90)
+            offset = max(2, size // 110)
+            shadow_layer = Image.new("L", (size, size), 0)
+            shadow_layer.paste(fitted_mask, (x, y + offset))
+            shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(blur))
+            # Keep it subtle: a heavy shadow reads as a cut-out, not a photo.
+            shadow_layer = shadow_layer.point(lambda v: int(v * 0.35))
 
         dark = Image.new("RGB", (size, size), (0, 0, 0))
         canvas = Image.composite(dark, canvas, shadow_layer)
@@ -558,6 +676,14 @@ def process(path: Path, args, bg_colour, base: str) -> list[str]:
         else:
             note = "busy background, kept"
 
+    if args.straighten and mask is not None:
+        angle = subject_angle(mask)
+        if angle is not None:
+            img = img.rotate(-angle, resample=Image.BICUBIC, expand=True,
+                             fillcolor=estimate_background_colour(img))
+            mask = mask.rotate(-angle, resample=Image.BICUBIC, expand=True, fillcolor=0)
+            note += f"; levelled {angle:+.0f} degrees"
+
     box = subject_bbox(img, mask)
     if box:
         # Leave a little of the original around the item so the crop does not
@@ -585,7 +711,8 @@ def process(path: Path, args, bg_colour, base: str) -> list[str]:
 
     for index, width in enumerate(args.sizes):
         square = compose_square(
-            img, mask, width, bg_colour, args.padding, not args.no_shadow
+            img, mask, width, bg_colour, args.padding, not args.no_shadow,
+            studio=args.studio,
         )
         suffix = "" if index == 0 else f"@{width}"
 
@@ -645,6 +772,9 @@ def main() -> int:
                         help="segmentation model for --studio: u2net (default) or "
                              "isnet-general-use, which handles flat and graphic objects "
                              "better. Try both and keep whichever preserves the item")
+    parser.add_argument("--straighten", action="store_true",
+                        help="level an item photographed at a slant. Skipped for round "
+                             "or irregular items, where there is no angle to correct")
     parser.add_argument("--lift", action="store_true",
                         help="brighten a photo taken in a dark room. Works on its own, so a photo that keeps its background still gets opened up")
     parser.add_argument("--erase-corner", action="append", choices=sorted(CORNERS),

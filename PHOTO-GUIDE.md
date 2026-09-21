@@ -76,6 +76,39 @@ re-shooting against something plain.
 
 ---
 
+## Staging: the part software cannot do
+
+Software can take the background away, level a crooked photo, brighten a dark
+room and put the item on a clean sweep. It cannot **rearrange the item**.
+
+The chafing dishes are the clearest example. In the photo the five pans
+overlap each other on a sheet of cardboard, so to a computer they are one
+shape, not five things that could be tidied into a row. Getting them laid out
+neatly means laying them out neatly and pressing the shutter again.
+
+That is what separates these from a catalogue photo, and it is ten minutes per
+item, not a skill:
+
+- **Sets of things** (chafer pans, plates, glassware, crates): lay them in a
+  row or a neat stack with a hand's width between them. Turn one to face the
+  camera and let the rest recede. Do not pile them up.
+- **Anything in a bag** (coconut cups, cake toppers, the floor mat, the table
+  covers): take it out. A photo of a bag sells a bag. If the packaging is part
+  of what they get, photograph it beside the item, not around it.
+- **Flat things** (tablecloths, the floor mat): lay one out, or drape it over
+  a chair or table corner so it has some shape. A folded bundle reads as
+  laundry.
+- **Big things** (tables, chairs): stand one up, ready to use, rather than
+  leaning against a wall. One upright table with a cloth on it sells the
+  table and the cloth at once.
+- **Sets with a hero**: put the best one at the front, slightly turned, the
+  rest behind it.
+
+Shoot straight on, at the item's own height, against a sheet or a plain wall,
+with the window in front of it. Then run it through with `--studio --lift`.
+
+---
+
 ## Studio mode: putting an item on a clean backdrop
 
 `--studio` cuts the item out using a segmentation model, which understands
@@ -87,6 +120,14 @@ cluttered basement photo into an item on a clean white backdrop.
 
 `--lift` brightens a photo taken in a dark room. It works on its own too, so a
 photo that keeps its background still gets opened up.
+
+`--straighten` levels an item photographed at a slant. It is skipped
+automatically for round or irregular items, where there is no angle to
+correct, so it is safe to leave on.
+
+With `--studio` the item is placed on a lit sweep rather than flat white, with
+a soft shadow beneath it so it looks like it is standing on a surface rather
+than floating.
 
 ### You have to look at every result
 
