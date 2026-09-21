@@ -76,6 +76,51 @@ re-shooting against something plain.
 
 ---
 
+## Studio mode: putting an item on a clean backdrop
+
+`--studio` cuts the item out using a segmentation model, which understands
+what an object is rather than matching background colours. It turns a
+cluttered basement photo into an item on a clean white backdrop.
+
+    python3 scripts/process_photos.py --in images/raw --out assets/rentals \
+        --studio --lift
+
+`--lift` brightens a photo taken in a dark room. It works on its own too, so a
+photo that keeps its background still gets opened up.
+
+### You have to look at every result
+
+This is the important part. The model sometimes removes **part of the item**,
+and there is no way to detect it automatically -- that was tested. The
+measurements that look like they should catch it do not: the vintage plate
+came out cut in half while scoring better on every geometric check than the
+pumpkin basket, which came out perfect.
+
+So: run it, then open the output folder and look at each photo. If an item is
+missing a piece, the photo needs a different treatment.
+
+### When a cut-out loses part of the item
+
+Two things to try, in this order:
+
+1. **A different model.** `--model isnet-general-use` handles flat and graphic
+   objects better than the default. On the photo of the tables, the default
+   dropped the wooden table entirely and this one kept all three items.
+2. **Drop `--lift`.** Brightening happens before the cut-out, and it changes
+   what the model sees. The same tables photo lost the wooden table again with
+   `--lift` on, and kept it with `--lift` off.
+
+If neither works, use `--no-knockout --lift` instead. The background stays, but
+the photo is still brightened, straightened and cropped, and the item is
+whole. Of the seventeen photos on the site, six are done this way, because
+both models clipped them: the plates, the floor mat, the photo booth props,
+the plastic table covers and the coconut cups.
+
+An honest photo with a dull background beats a clean cut-out with a bite
+taken out of the item.
+
+---
+
 ## Rescuing a photo you cannot retake
 
 Sometimes an item is packed away or the photo is the only one there is. A

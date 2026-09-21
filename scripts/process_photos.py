@@ -299,6 +299,136 @@ def erase_corner_object(img: Image.Image, corner: str, threshold: int = 110) -> 
 
 
 # --------------------------------------------------------------------------
+# studio mode: proper subject segmentation
+# --------------------------------------------------------------------------
+
+_SESSION = None
+
+
+def _segmentation_session(name: str = "u2net"):
+    """Load the segmentation model once, and only if studio mode is used."""
+    global _SESSION
+    if _SESSION is None or _SESSION[0] != name:
+        from rembg import new_session
+        _SESSION = (name, new_session(name))
+    return _SESSION[1]
+
+
+def studio_alpha(img: Image.Image, model: str = "u2net") -> Image.Image | None:
+    """
+    Cut the item out of its surroundings using a segmentation model, which
+    understands what an object is rather than matching background colour.
+    That is what makes a cluttered basement photo usable.
+
+    Returns None when the result does not look trustworthy, so the caller can
+    keep the original background rather than publish a mangled item. Losing
+    part of the item is far worse than keeping a dull background.
+    """
+    from rembg import remove
+
+    mask = remove(
+        img, session=_segmentation_session(model),
+        only_mask=True, post_process_mask=True,
+    ).convert("L")
+
+    arr = np.asarray(mask)
+    solid = arr > 32
+    coverage = float(solid.mean())
+
+    # Nothing found, or the whole frame claimed as subject: not usable.
+    if not 0.015 <= coverage <= 0.97:
+        return None
+
+    ys, xs = np.nonzero(solid)
+    box_area = (xs.max() - xs.min() + 1) * (ys.max() - ys.min() + 1)
+    if solid.sum() / float(box_area) < 0.12:
+        return None  # scattered specks rather than one object
+
+    mask = drop_specks(mask)
+
+    # Grow slightly, so a thin handle or a wire edge is not shaved off.
+    mask = mask.filter(ImageFilter.MaxFilter(5))
+    return mask.filter(ImageFilter.GaussianBlur(1.2))
+
+
+def drop_specks(mask: Image.Image, keep_fraction: float = 0.02) -> Image.Image:
+    """
+    Remove stray fragments the cut-out left behind, without touching real
+    objects. Anything smaller than `keep_fraction` of the largest piece goes.
+
+    Deliberately NOT "keep the biggest piece only": several items here are
+    genuinely a set of separate objects -- five chafer pans in a row, three
+    stacked dispensers -- and keeping only the largest would delete most of
+    the item. Labelling happens on a small copy, which is fast and still
+    distinguishes a speck from an object.
+    """
+    small = mask.resize((min(500, mask.width), min(500, mask.height)), Image.NEAREST)
+    arr = np.asarray(small) > 32
+    if not arr.any():
+        return mask
+
+    # Label by flooding each unvisited piece in turn.
+    work = Image.fromarray(np.dstack([np.where(arr, 255, 0).astype(np.uint8)] * 3), "RGB")
+    pixels = np.asarray(work)
+    sizes = []
+    marker = 1
+    while True:
+        remaining = (pixels[:, :, 0] == 255) & (pixels[:, :, 1] == 255)
+        if not remaining.any() or marker > 60:
+            break
+        ys, xs = np.nonzero(remaining)
+        ImageDraw.floodfill(work, (int(xs[0]), int(ys[0])), (marker, 0, 0), thresh=0)
+        pixels = np.asarray(work)
+        sizes.append((marker, int(((pixels[:, :, 0] == marker) & (pixels[:, :, 1] == 0)).sum())))
+        marker += 1
+
+    if not sizes:
+        return mask
+
+    biggest = max(size for _, size in sizes)
+    doomed = [m for m, size in sizes if size < biggest * keep_fraction]
+    if not doomed:
+        return mask
+
+    kill = np.zeros(arr.shape, bool)
+    for m in doomed:
+        kill |= (pixels[:, :, 0] == m) & (pixels[:, :, 1] == 0)
+
+    kill_full = np.asarray(
+        Image.fromarray((kill * 255).astype(np.uint8)).resize(mask.size, Image.NEAREST)
+    ) > 127
+    cleaned = np.asarray(mask).copy()
+    cleaned[kill_full] = 0
+    return Image.fromarray(cleaned, mode="L")
+
+
+def lift_exposure(img: Image.Image) -> Image.Image:
+    """
+    Open up a photo taken in a dark room. The highlights are stretched toward
+    white and the midtones lifted, but only as far as the photo actually needs,
+    so an already well-lit photo is left alone.
+    """
+    arr = np.asarray(img.convert("RGB"), dtype=np.float32)
+    luma = arr @ np.array([0.2126, 0.7152, 0.0722], dtype=np.float32)
+
+    high = float(np.percentile(luma, 99.0))
+    if high < 4:
+        return img
+
+    gain = min(250.0 / high, 2.6)
+    if gain > 1.02:
+        arr = arr * gain
+
+    # Midtone lift, scaled by how dark the photo still is.
+    mid = float(np.median(np.clip(arr, 0, 255) @ np.array([0.2126, 0.7152, 0.0722], np.float32)))
+    if mid < 118:
+        gamma = max(0.62, mid / 118.0)
+        arr = 255.0 * np.power(np.clip(arr, 0, 255) / 255.0, gamma)
+
+    return Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8), mode="RGB")
+
+
+# --------------------------------------------------------------------------
 # colour
 # --------------------------------------------------------------------------
 
@@ -414,7 +544,14 @@ def process(path: Path, args, bg_colour, base: str) -> list[str]:
 
     mask = None
     note = "background kept"
-    if not args.no_knockout:
+
+    if args.lift:
+        img = lift_exposure(img)
+
+    if args.studio:
+        mask = studio_alpha(img, args.model)
+        note = "studio cut-out" if mask is not None else "cut-out not confident, background kept"
+    elif not args.no_knockout:
         if args.force_knockout or background_is_plain(img):
             mask = build_subject_mask(img, args.tolerance)
             note = "background removed" if mask else "backdrop too complex, kept"
@@ -499,6 +636,17 @@ def main() -> int:
                         help="remove the background even if the backdrop looks busy")
     parser.add_argument("--no-shadow", action="store_true",
                         help="skip the drop shadow")
+    parser.add_argument("--studio", action="store_true",
+                        help="cut the item out with a segmentation model and place it on "
+                             "a clean backdrop. Much better on cluttered photos than the "
+                             "colour-matching default, and keeps the background when it "
+                             "is not confident")
+    parser.add_argument("--model", default="u2net",
+                        help="segmentation model for --studio: u2net (default) or "
+                             "isnet-general-use, which handles flat and graphic objects "
+                             "better. Try both and keep whichever preserves the item")
+    parser.add_argument("--lift", action="store_true",
+                        help="brighten a photo taken in a dark room. Works on its own, so a photo that keeps its background still gets opened up")
     parser.add_argument("--erase-corner", action="append", choices=sorted(CORNERS),
                         help="paint out a dark object intruding from this corner and "
                              "rebuild the backdrop behind it. Only the dark area joined "

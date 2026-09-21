@@ -80,6 +80,9 @@ the photo — that text is what a blind visitor hears, and what Google reads.
 Useful options:
 
 | Option | What it does |
+| `--studio` | Cut the item out and place it on a clean backdrop |
+| `--lift` | Brighten a photo taken in a dark room |
+| `--model isnet-general-use` | A second segmentation model, better on flat objects |
 | --- | --- |
 | `--dry-run` | Report what it would do, write nothing |
 | `--bg "#f7eee1"` | Backdrop colour (the site's cream, instead of white) |
