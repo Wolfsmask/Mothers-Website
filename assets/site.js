@@ -184,12 +184,73 @@
     }
   }
 
-  // Rental catalog. Categories and items come from site-config.js so the
-  // inventory can be edited without touching HTML. An item with no photo
-  // renders as a plain text entry rather than a broken image, so the page
-  // stays presentable while photography is still being done.
+  // ---- Analytics helper -------------------------------------------------
+  // Does nothing unless Analytics is both configured and allowed by the
+  // visitor, so a visitor who declined is never recorded.
+  function track(eventName, params) {
+    if (typeof window.gtag !== "function") return;
+    try { window.gtag("event", eventName, params || {}); } catch (e) { /* never break the page for a stat */ }
+  }
+
+  // Which navigation tabs get used. Page views and time on page are recorded
+  // by Analytics itself; this adds which link people took to get there.
+  document.querySelectorAll("[data-nav-links] a").forEach(link => {
+    link.addEventListener("click", () => {
+      track("nav_click", {
+        link_text: (link.textContent || "").trim().slice(0, 80),
+        link_url: link.getAttribute("href") || ""
+      });
+    });
+  });
+
+  // ---- Events dropdown ---------------------------------------------------
+  document.querySelectorAll("[data-dropdown]").forEach(dropdown => {
+    const toggle = dropdown.querySelector("[data-dropdown-toggle]");
+    const menu = dropdown.querySelector("[data-dropdown-menu]");
+    if (!toggle || !menu) return;
+
+    const setOpen = open => {
+      menu.setAttribute("data-open", String(open));
+      toggle.setAttribute("aria-expanded", String(open));
+    };
+    setOpen(false);
+
+    toggle.addEventListener("click", event => {
+      event.stopPropagation();
+      const isOpen = toggle.getAttribute("aria-expanded") === "true";
+      setOpen(!isOpen);
+      if (!isOpen) track("nav_click", { link_text: "Events (menu opened)", link_url: "" });
+    });
+
+    menu.querySelectorAll("a").forEach(a => a.addEventListener("click", () => setOpen(false)));
+
+    document.addEventListener("click", event => {
+      if (!dropdown.contains(event.target)) setOpen(false);
+    });
+    dropdown.addEventListener("keydown", event => {
+      if (event.key === "Escape" && toggle.getAttribute("aria-expanded") === "true") {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+  });
+
+  // ---- Rental catalog ----------------------------------------------------
+  // Categories and items come from site-config.js so the inventory can be
+  // edited without touching HTML. An item with no photo renders as a plain
+  // text entry rather than a broken image, so the page stays presentable
+  // while photography is still being done. An item WITH photos renders as a
+  // button that opens a larger preview.
   const catalogSection = document.querySelector("[data-rentals]");
   const catalogGrid = document.querySelector("[data-rentals-grid]");
+  const previewable = [];
+
+  function itemPhotos(item) {
+    if (Array.isArray(item.images)) return item.images.filter(Boolean);
+    if (item.image) return [item.image];
+    return [];
+  }
+
   if (catalogSection && catalogGrid) {
     const groups = Array.isArray(cfg.rentals)
       ? cfg.rentals.filter(g => g && !g.hidden && g.category && Array.isArray(g.items))
@@ -203,18 +264,35 @@
         if (!items.length) return "";
 
         const rows = items.map(item => {
-          const photo = item.image
-            ? `<img class="catalog-item__photo" loading="lazy" decoding="async"
-                 src="assets/rentals/${escapeAttr(item.image)}.webp"
-                 alt="${escapeAttr(item.name)}">`
-            : "";
+          const photos = itemPhotos(item);
           const detail = item.detail
             ? `<span class="catalog-item__detail">${escapeHtml(item.detail)}</span>`
             : "";
-          return `<li class="catalog-item">${photo}
+
+          if (!photos.length) {
+            return `<li><span class="catalog-item">
+                      <span class="catalog-item__name">${escapeHtml(item.name)}</span>
+                      ${detail}
+                    </span></li>`;
+          }
+
+          const index = previewable.length;
+          previewable.push({
+            name: item.name,
+            detail: item.detail || "",
+            category: group.category,
+            photos: photos
+          });
+
+          return `<li><button type="button" class="catalog-item catalog-item--previewable"
+                    data-preview="${index}"
+                    aria-label="Preview ${escapeAttr(item.name)}">
+                    <img class="catalog-item__photo" loading="lazy" decoding="async"
+                         src="assets/rentals/${escapeAttr(photos[0])}.webp" alt="">
                     <span class="catalog-item__name">${escapeHtml(item.name)}</span>
                     ${detail}
-                  </li>`;
+                    <span class="catalog-item__zoom">Preview${photos.length > 1 ? " \u00B7 " + photos.length + " photos" : ""}</span>
+                  </button></li>`;
         }).join("");
 
         const blurb = group.blurb
@@ -231,7 +309,96 @@
       // Entries built after the observer was set up need registering too, or
       // they stay stuck at the reveal animation's starting opacity.
       catalogGrid.querySelectorAll(".reveal").forEach(el => el.classList.add("visible"));
+
+      catalogGrid.querySelectorAll("[data-preview]").forEach(button => {
+        button.addEventListener("click", () => {
+          openPreview(Number(button.dataset.preview), button);
+        });
+      });
     }
+  }
+
+  // ---- Item preview ------------------------------------------------------
+  let previewDialog = null;
+  let previewReturnFocus = null;
+
+  function buildPreviewDialog() {
+    if (previewDialog) return previewDialog;
+    previewDialog = document.createElement("dialog");
+    previewDialog.className = "preview";
+    previewDialog.setAttribute("aria-label", "Item preview");
+    previewDialog.addEventListener("close", () => {
+      if (previewReturnFocus && typeof previewReturnFocus.focus === "function") {
+        previewReturnFocus.focus();
+      }
+    });
+    // A click on the backdrop lands on the dialog element itself.
+    previewDialog.addEventListener("click", event => {
+      if (event.target === previewDialog) closePreview();
+    });
+    document.body.appendChild(previewDialog);
+    return previewDialog;
+  }
+
+  function closePreview() {
+    if (!previewDialog) return;
+    if (typeof previewDialog.close === "function" && previewDialog.open) previewDialog.close();
+    else previewDialog.removeAttribute("open");
+  }
+
+  function openPreview(index, sourceButton) {
+    const item = previewable[index];
+    if (!item) return;
+
+    previewReturnFocus = sourceButton || document.activeElement;
+    const dialog = buildPreviewDialog();
+    let current = 0;
+
+    const render = () => {
+      const thumbs = item.photos.length > 1
+        ? `<ul class="preview__thumbs">${item.photos.map((photo, i) => `
+             <li><button type="button" class="preview__thumb" data-thumb="${i}"
+                   aria-current="${i === current}"
+                   aria-label="Photo ${i + 1} of ${item.photos.length}">
+                   <img src="assets/rentals/${escapeAttr(photo)}.webp" alt=""></button></li>`).join("")}</ul>`
+        : "";
+
+      dialog.innerHTML = `
+        <button type="button" class="preview__close" aria-label="Close preview">&times;</button>
+        <div class="preview__media">
+          <img src="assets/rentals/${escapeAttr(item.photos[current])}.webp"
+               alt="${escapeAttr(item.name)}">
+        </div>
+        <div class="preview__body">
+          <p class="preview__category">${escapeHtml(item.category)}</p>
+          <h2>${escapeHtml(item.name)}</h2>
+          ${item.detail ? `<p class="preview__detail">${escapeHtml(item.detail)}</p>` : ""}
+          ${thumbs}
+          <a class="button gold" href="index.html#contact">Ask about this item &rarr;</a>
+        </div>`;
+
+      dialog.querySelector(".preview__close").addEventListener("click", closePreview);
+      dialog.querySelectorAll("[data-thumb]").forEach(thumb => {
+        thumb.addEventListener("click", () => {
+          current = Number(thumb.dataset.thumb);
+          render();
+        });
+      });
+    };
+
+    render();
+
+    // showModal gives focus trapping and Escape-to-close for free.
+    if (typeof dialog.showModal === "function") dialog.showModal();
+    else dialog.setAttribute("open", "");
+    dialog.querySelector(".preview__close").focus();
+
+    // Which items people actually open is the signal worth having: it says
+    // what to stock more of, which page views alone cannot.
+    track("rental_preview", {
+      item_name: item.name,
+      item_category: item.category
+    });
   }
 
   // Analytics loads only after a real Measurement ID is configured and the visitor opts in.

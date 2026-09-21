@@ -37,8 +37,22 @@
         <nav aria-label="Main navigation">
           <ul class="nav-links" data-nav-links>
             <li><a href="services.html">Services</a></li>
-            <li><a href="weddings.html">Weddings</a></li>
+            <li class="nav-dropdown" data-dropdown>
+              <button class="nav-dropdown__toggle" type="button" data-dropdown-toggle
+                      aria-expanded="false" aria-controls="events-menu">Events<span class="nav-dropdown__caret" aria-hidden="true"></span></button>
+              <ul class="nav-dropdown__menu" id="events-menu" data-dropdown-menu>
+                <li><a href="events.html">All Events</a></li>
+                <li><a href="weddings.html">Weddings</a></li>
+                <li><a href="birthdays.html">Birthday Parties</a></li>
+                <li><a href="baby-showers.html">Baby Showers</a></li>
+                <li><a href="graduations.html">Graduations</a></li>
+                <li><a href="anniversaries.html">Anniversaries</a></li>
+                <li><a href="corporate.html">Corporate Events</a></li>
+                <li><a href="themed-events.html">Themed Events</a></li>
+              </ul>
+            </li>
             <li><a href="rentals.html">Rentals</a></li>
+            <li><a href="entertainment.html">Entertainment</a></li>
             <li><a href="about.html">About</a></li>
             <li><a href="index.html#faq">FAQ</a></li>
             <li data-contact-nav><a class="button gold" href="index.html#contact">Plan Your Event →</a></li>
@@ -88,7 +102,6 @@
               <a href="weddings.html">Weddings</a>
               <a href="bartending.html">Bartending</a>
               <a href="coordination.html">Coordination</a>
-              <a href="entertainment.html">Entertainment</a>
               <a href="rentals.html">Rentals</a>
             </div>
           </div>

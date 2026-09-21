@@ -27,6 +27,13 @@ Page wording lives in the `.html` files directly.
 
 ---
 
+## Seeing what people look at
+
+`ANALYTICS.md` covers setting up free Google Analytics: which tabs get
+visited, how long people stay, and which rental items they open for a closer
+look. The code is already in place and does nothing until a Measurement ID is
+added to `assets/site-config.js`.
+
 ## The rental catalog
 
 `rentals.html` builds itself from the `rentals` list in
@@ -36,6 +43,20 @@ can be added a few at a time without the page ever looking half-finished.
 
 Set `hidden: true` on any item or category that is not currently for rent,
 rather than deleting it, so it can be brought back later.
+
+**Photos and previews.** An item with a photo becomes clickable: visitors get
+a larger preview with the name and details before they enquire. Give an item
+one photo with `image: "file-name"`, or several with
+`images: ["front", "back", "in-use"]`, and the preview gains thumbnails to
+switch between them. Items with no photo stay as plain text entries.
+
+## The top navigation
+
+The nav is repeated in every `.html` file. To change it, edit one file and
+copy the `<nav aria-label="Main navigation">` block into the others, or the
+links will disagree between pages. The Events dropdown is the `nav-dropdown`
+list item; adding an event type means adding a link there and creating the
+matching page.
 
 See `INVENTORY.md` for the full transcribed stock list and the readings that
 still need confirming, and `PHOTO-GUIDE.md` for how to shoot the photos.
@@ -105,7 +126,14 @@ domain is final, generate `sitemap.xml` with absolute URLs and add a
 
     index.html              Home, including the FAQ and inquiry form
     services.html           Service overview
+    events.html             Events hub, linked from the Events dropdown
     weddings.html           Wedding landing page
+    birthdays.html          Birthday parties
+    baby-showers.html       Baby showers
+    graduations.html        Graduations
+    anniversaries.html      Anniversaries
+    corporate.html          Corporate and business events
+    themed-events.html      Themed events
     bartending.html         Bartending landing page
     coordination.html       Coordination landing page
     entertainment.html      Entertainment landing page
@@ -120,4 +148,5 @@ domain is final, generate `sitemap.xml` with absolute URLs and add a
     assets/site.js          Page behaviour
     scripts/process_photos.py   Photo processing
     images/raw/             Put original photos here (not committed)
-    assets/gallery/         Processed photos, written by the script
+    assets/rentals/         Catalog item photos
+    assets/gallery/         Event photos
