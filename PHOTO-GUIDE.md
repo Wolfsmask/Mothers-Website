@@ -76,6 +76,35 @@ re-shooting against something plain.
 
 ---
 
+## Rescuing a photo you cannot retake
+
+Sometimes an item is packed away or the photo is the only one there is. A
+photo can often be salvaged by cutting the distractions out first.
+
+The Halloween pumpkin basket on the site was done this way. The original had a
+hand holding it at the top, a doorframe down the right, and a dark wall sign in
+the corner. Cropping those away left a usable photo of the basket.
+
+Open the photo in any viewer that shows pixel coordinates, note where the item
+starts and ends, and pass those numbers in:
+
+    python3 scripts/process_photos.py --in images/raw --out assets/rentals \
+        --crop 105 235 1370 1575
+
+The four numbers are pixels from the top-left corner: left, top, right,
+bottom. Use `0` for right or bottom to mean "all the way to the edge". It
+applies to every photo in the folder, so do salvage jobs one at a time, in a
+folder of their own.
+
+What cropping can fix: a hand, a doorframe, another object in shot, too much
+empty space around a small item.
+
+What it cannot fix: an item still inside a plastic bag, a photo too dark to
+show the colours, or a background so cluttered it runs behind the item. Those
+need the item taking out and photographing again.
+
+---
+
 ## One thing that must not go on the site
 
 Among the inventory photos was an image of wire chafer racks carrying an

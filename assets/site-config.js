@@ -96,7 +96,7 @@ window.UNTAMED_CONFIG = {
         { name: "Photo booth props", detail: "", image: "" },
         { name: "Wood clip board for pictures", detail: "", image: "" },
         { name: "Boxed paper letters", detail: "Spelling ONE, and Wild One, for first birthdays", image: "" },
-        { name: "Seasonal decor", detail: "Including a Halloween pumpkin basket", image: "" },
+        { name: "Halloween pumpkin basket", detail: "Black twisted-metal frame with purple roses, black foliage and silver glitter berries", image: "halloween-pumpkin-basket" },
         { name: "Vases", detail: "Small, medium and large", image: "" },
         { name: "Wood crates", detail: "Three-pack: large, medium, small", image: "" },
         { name: "Tea light candles", detail: "Electric and real flame", image: "" },

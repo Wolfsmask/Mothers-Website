@@ -317,6 +317,18 @@ def process(path: Path, args, bg_colour, base: str) -> list[str]:
         img = ImageOps.exif_transpose(opened)
         img = img.convert("RGB") if img.mode != "RGB" else img.copy()
 
+    # Salvaging one awkward photo: cut off a hand, a doorframe, or whatever
+    # else strayed into frame, before anything else runs.
+    if args.crop:
+        left, top, right, bottom = args.crop
+        right = right if right > 0 else img.width
+        bottom = bottom if bottom > 0 else img.height
+        left, top = max(0, left), max(0, top)
+        right, bottom = min(img.width, right), min(img.height, bottom)
+        if right - left < 32 or bottom - top < 32:
+            raise ValueError(f"--crop leaves nothing of {path.name}")
+        img = img.crop((left, top, right, bottom))
+
     mask = None
     note = "background kept"
     if not args.no_knockout:
@@ -404,6 +416,10 @@ def main() -> int:
                         help="remove the background even if the backdrop looks busy")
     parser.add_argument("--no-shadow", action="store_true",
                         help="skip the drop shadow")
+    parser.add_argument("--crop", type=int, nargs=4, metavar=("LEFT", "TOP", "RIGHT", "BOTTOM"),
+                        help="cut the photo down before processing, in pixels from the "
+                             "top-left. Use 0 for RIGHT or BOTTOM to mean the full edge. "
+                             "Applies to every photo in the run, so use it on one at a time")
     parser.add_argument("--dry-run", action="store_true",
                         help="report what would happen, write nothing")
     args = parser.parse_args()
