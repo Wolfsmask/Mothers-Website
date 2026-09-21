@@ -96,6 +96,17 @@ bottom. Use `0` for right or bottom to mean "all the way to the edge". It
 applies to every photo in the folder, so do salvage jobs one at a time, in a
 folder of their own.
 
+If something dark intrudes from a corner -- a wall sign, a dark doorway --
+it can be painted out and the wall rebuilt behind it:
+
+    python3 scripts/process_photos.py --in images/raw --out assets/rentals \
+        --crop 108 240 1403 1613 --erase-corner top-left
+
+Only the dark area actually joined to that corner is touched. That matters:
+the first version of this simply erased dark pixels near the corner, and ate
+part of the basket along with the sign. The item is separated from the
+intruder by wall, so starting at the corner reaches the sign and stops.
+
 What cropping can fix: a hand, a doorframe, another object in shot, too much
 empty space around a small item.
 

@@ -203,10 +203,20 @@ Items visible in the stock photos, confirming or adding to the written sheets:
    PDF, or something sent privately at booking.
 9. **Prices.** None recorded on any sheet or photo, so the pricing section of
    the site stays hidden.
-10. **The photographs.** Most are records of stock rather than sales photos:
-   dark, shot in a basement, items still bagged, a hand in frame. The catalog
-   is built and every item has a photo slot ready, but they need re-shooting.
-   See `PHOTO-GUIDE.md`. The lit sign photos are the exception and are good.
-11. **One photo is AI-generated.** The wire chafer racks image carries an
-   "AI-generated content" watermark, so it does not show the actual racks and
-   must not be used to advertise them.
+10. **The photographs are now on the site.** Seventeen were processed from
+   the PDF and are live in the catalog. They are honest photographs of the
+   actual stock, but several still show items inside their packaging or a
+   hand holding them, because that is how they were taken. Re-shooting those
+   against something plain would lift the whole page; `PHOTO-GUIDE.md` covers
+   it. The three lit sign photos are genuinely good and need nothing.
+11. **Two photos were excluded as AI-generated.** Both images of the wire
+   chafer racks carry an "AI-generated content" watermark, so they do not show
+   the actual racks and cannot be used to advertise them. A real photograph of
+   the racks is still needed.
+12. **Items still without a photograph:** risers, glassware, mugs, clear
+   buckets, hanging signs, direction arrows, quote signs, rope light,
+   extension cords, backdrops, the photo station set, the wood clip board,
+   boxed paper letters, vases, wood crates, tea light candles, the cotton
+   candy and bubble machines, the red carpet, the fire pit, all the outdoor
+   and water games, board and card games, kids' activities, the karaoke
+   machine, fans, the mini fridge and the TV.

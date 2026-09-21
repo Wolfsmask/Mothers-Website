@@ -42,8 +42,8 @@ window.UNTAMED_CONFIG = {
       category: "Tables & Seating",
       blurb: "The basics, plus the covers to go over them.",
       items: [
-        { name: "Rectangle tables", detail: "3ft, 6ft and 8ft", image: "" },
-        { name: "Folding chairs", detail: "", image: "" },
+        { name: "Rectangle tables", detail: "3ft, 6ft and 8ft", image: "tables-and-chairs" },
+        { name: "Folding chairs", detail: "", image: "tables-and-chairs" },
         { name: "Risers", detail: "Two sets available", image: "" }
       ]
     },
@@ -51,17 +51,17 @@ window.UNTAMED_CONFIG = {
       category: "Linens & Table Covers",
       blurb: "Fabric and disposable, in plain colours and seasonal prints.",
       items: [
-        { name: "Fabric tablecloths", detail: "Royal blue, peach, white, Halloween", image: "" },
-        { name: "Plastic table covers", detail: "White stay-on, patriotic, Halloween, confetti", image: "" }
+        { name: "Fabric tablecloths", detail: "Royal blue, peach, white, Halloween", image: "ivory-linens" },
+        { name: "Plastic table covers", detail: "White stay-on, patriotic, Halloween, confetti", images: ["plastic-table-covers", "halloween-table-cover"] }
       ]
     },
     {
       category: "Tableware",
       blurb: "Plates and glassware by theme, for when paper will not do.",
       items: [
-        { name: "Themed plates", detail: "Vintage, Christmas tree, sunflower, pumpkin, bees, plaid", image: "" },
+        { name: "Themed plates", detail: "Vintage, Christmas tree, sunflower, pumpkin, bees, plaid", images: ["christmas-tree-plates", "vintage-plates"] },
         { name: "Glassware", detail: "Shot, champagne, lemon, bee, pumpkin and stemmed glasses", image: "" },
-        { name: "Pineapple & coconut cups", detail: "", image: "" },
+        { name: "Pineapple & coconut cups", detail: "", image: "coconut-cups" },
         { name: "Mugs", detail: "Red and blue", image: "" }
       ]
     },
@@ -69,9 +69,9 @@ window.UNTAMED_CONFIG = {
       category: "Catering & Serving",
       blurb: "Chafer sets for keeping food hot on a buffet line.",
       items: [
-        { name: "Sterno chafer sets", detail: "Seven available. Rack, fuel, water pan, food pan and lid. Instructions included", image: "" },
-        { name: "Chafer add-ons", detail: "Extra fuel cans and serving ladles", image: "" },
-        { name: "Drink station dispensers", detail: "Labelled for lime juice, sugar and salt", image: "" },
+        { name: "Sterno chafer sets", detail: "Seven available. Rack, fuel, water pan, food pan and lid. Instructions included", image: "chafing-dish-sets" },
+        { name: "Chafer add-ons", detail: "Extra fuel cans and serving ladles", image: "chafer-fuel" },
+        { name: "Drink station dispensers", detail: "Labelled for lime juice, sugar and salt", image: "drink-dispensers" },
         { name: "Clear buckets", detail: "Small, medium and large", image: "" }
       ]
     },
@@ -79,7 +79,7 @@ window.UNTAMED_CONFIG = {
       category: "Signs & Lighting",
       blurb: "Light-up signs, hanging signs and the cords to run them.",
       items: [
-        { name: "Light-up signs", detail: "Oh Baby, Will You Marry Me, You + Me, Love, Be Happy", image: "" },
+        { name: "Light-up signs", detail: "Oh Baby, Will You Marry Me, You + Me, Love, Be Happy", images: ["sign-oh-baby", "sign-will-you-marry-me", "sign-you-and-me"] },
         { name: "Hanging signs", detail: "Happy Birthday, Graduation, Anniversary", image: "" },
         { name: "Direction arrows", detail: "Stake into the ground", image: "" },
         { name: "Positive quote signs", detail: "\u201CDo what you love\u201D, \u201CBe the change\u201D", image: "" },
@@ -93,14 +93,14 @@ window.UNTAMED_CONFIG = {
       items: [
         { name: "Backdrops", detail: "", image: "" },
         { name: "Photo station set", detail: "Camera and prints not included", image: "" },
-        { name: "Photo booth props", detail: "", image: "" },
+        { name: "Photo booth props", detail: "", image: "photo-booth-props" },
         { name: "Wood clip board for pictures", detail: "", image: "" },
         { name: "Boxed paper letters", detail: "Spelling ONE, and Wild One, for first birthdays", image: "" },
         { name: "Halloween pumpkin basket", detail: "Black twisted-metal frame with purple roses, black foliage and silver glitter berries", image: "halloween-pumpkin-basket" },
         { name: "Vases", detail: "Small, medium and large", image: "" },
         { name: "Wood crates", detail: "Three-pack: large, medium, small", image: "" },
         { name: "Tea light candles", detail: "Electric and real flame", image: "" },
-        { name: "Cake and cupcake toppers", detail: "", image: "" }
+        { name: "Cake and cupcake toppers", detail: "", image: "cake-toppers" }
       ]
     },
     {
@@ -120,7 +120,7 @@ window.UNTAMED_CONFIG = {
         { name: "Outdoor games", detail: "Cornhole, ring toss, wiffle ball, badminton, volleyball, basketball hoop", image: "" },
         { name: "Water games", detail: "Water balloons and sprinklers", image: "" },
         { name: "Board & card games", detail: "Checkers, Connect Four, card decks", image: "" },
-        { name: "Floor games", detail: "Large floor mat game", image: "" },
+        { name: "Floor games", detail: "Large floor mat game", image: "floor-mat-game" },
         { name: "Kids' activities", detail: "Cardboard building blocks, building bricks, colouring, foam mat puzzle", image: "" },
         { name: "Karaoke machine", detail: "Small, with discs", image: "" }
       ]

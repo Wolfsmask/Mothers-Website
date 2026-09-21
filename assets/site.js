@@ -288,7 +288,7 @@
                     data-preview="${index}"
                     aria-label="Preview ${escapeAttr(item.name)}">
                     <img class="catalog-item__photo" loading="lazy" decoding="async"
-                         src="assets/rentals/${escapeAttr(photos[0])}.webp" alt="">
+                         src="assets/rentals/${escapeAttr(photos[0])}@400.webp" alt="">
                     <span class="catalog-item__name">${escapeHtml(item.name)}</span>
                     ${detail}
                     <span class="catalog-item__zoom">Preview${photos.length > 1 ? " \u00B7 " + photos.length + " photos" : ""}</span>
@@ -360,7 +360,7 @@
              <li><button type="button" class="preview__thumb" data-thumb="${i}"
                    aria-current="${i === current}"
                    aria-label="Photo ${i + 1} of ${item.photos.length}">
-                   <img src="assets/rentals/${escapeAttr(photo)}.webp" alt=""></button></li>`).join("")}</ul>`
+                   <img src="assets/rentals/${escapeAttr(photo)}@400.webp" alt=""></button></li>`).join("")}</ul>`
         : "";
 
       dialog.innerHTML = `

@@ -219,6 +219,86 @@ def build_subject_mask(img: Image.Image, tolerance: int) -> Image.Image | None:
 
 
 # --------------------------------------------------------------------------
+# corner clean-up
+# --------------------------------------------------------------------------
+
+CORNERS = {
+    "top-left": (0.0, 0.0),
+    "top-right": (1.0, 0.0),
+    "bottom-left": (0.0, 1.0),
+    "bottom-right": (1.0, 1.0),
+}
+
+
+def erase_corner_object(img: Image.Image, corner: str, threshold: int = 110) -> Image.Image:
+    """
+    Paint out a dark object intruding from one corner -- a wall sign, a shadowed
+    doorway -- and rebuild the backdrop behind it.
+
+    Only the dark region CONNECTED to that corner is touched. That matters: a
+    first attempt at this simply erased every dark pixel near the corner, which
+    also ate the dark parts of the item itself. The item is separated from the
+    intruder by backdrop, so a connected region starting at the corner reaches
+    the intruder and stops.
+    """
+    arr = np.asarray(img.convert("RGB"), dtype=np.float32)
+    h, w = arr.shape[:2]
+    lum = arr.mean(axis=2)
+
+    fx, fy = CORNERS[corner]
+    seed = (min(w - 1, int(fx * (w - 1))), min(h - 1, int(fy * (h - 1))))
+
+    if lum[seed[1], seed[0]] >= threshold:
+        return img  # that corner is backdrop already; nothing to do
+
+    # Flood the dark region outward from the corner, and no further.
+    # The flood runs on an RGB copy on purpose: Pillow's floodfill silently
+    # fills nothing at all on an "L" mode image, so a greyscale mask here
+    # would quietly do nothing and leave the object in place.
+    binary = np.where(lum < threshold, 0, 255).astype(np.uint8)
+    flat = Image.fromarray(np.dstack([binary] * 3), mode="RGB")
+    ImageDraw.floodfill(flat, seed, (255, 0, 255), thresh=0)
+    filled_rgb = np.asarray(flat)
+    mask = (
+        (filled_rgb[:, :, 0] == 255)
+        & (filled_rgb[:, :, 1] == 0)
+        & (filled_rgb[:, :, 2] == 255)
+    )
+
+    # Grow it slightly so the object's soft edge goes with it.
+    grown = Image.fromarray((mask * 255).astype(np.uint8)).filter(ImageFilter.MaxFilter(9))
+    mask = np.asarray(grown) > 127
+
+    if mask.mean() > 0.35:
+        # More than a third of the frame is not a corner intrusion; leave it be
+        # rather than repaint most of the photo.
+        return img
+
+    # Rebuild the backdrop by growing neighbouring known pixels inward. The
+    # backdrop is a smooth gradient, so this reconstructs it convincingly.
+    filled = arr.copy()
+    known = ~mask
+    for _ in range(400):
+        todo = ~known
+        if not todo.any():
+            break
+        acc = np.zeros_like(filled)
+        cnt = np.zeros((h, w), np.float32)
+        for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            acc += np.roll(np.where(known[..., None], filled, 0), (dy, dx), (0, 1))
+            cnt += np.roll(known, (dy, dx), (0, 1)).astype(np.float32)
+        newly = todo & (cnt > 0)
+        if not newly.any():
+            break
+        filled[newly] = acc[newly] / np.maximum(cnt[newly][:, None], 1)
+        known |= newly
+
+    out = Image.fromarray(np.clip(filled, 0, 255).astype(np.uint8), mode="RGB")
+    soft = Image.fromarray((mask * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(5))
+    return Image.composite(out.filter(ImageFilter.GaussianBlur(6)), out, soft)
+
+
+# --------------------------------------------------------------------------
 # colour
 # --------------------------------------------------------------------------
 
@@ -329,6 +409,9 @@ def process(path: Path, args, bg_colour, base: str) -> list[str]:
             raise ValueError(f"--crop leaves nothing of {path.name}")
         img = img.crop((left, top, right, bottom))
 
+    for corner in args.erase_corner or []:
+        img = erase_corner_object(img, corner)
+
     mask = None
     note = "background kept"
     if not args.no_knockout:
@@ -416,6 +499,11 @@ def main() -> int:
                         help="remove the background even if the backdrop looks busy")
     parser.add_argument("--no-shadow", action="store_true",
                         help="skip the drop shadow")
+    parser.add_argument("--erase-corner", action="append", choices=sorted(CORNERS),
+                        help="paint out a dark object intruding from this corner and "
+                             "rebuild the backdrop behind it. Only the dark area joined "
+                             "to that corner is touched, so the item is never eaten. "
+                             "Repeat for more than one corner")
     parser.add_argument("--crop", type=int, nargs=4, metavar=("LEFT", "TOP", "RIGHT", "BOTTOM"),
                         help="cut the photo down before processing, in pixels from the "
                              "top-left. Use 0 for RIGHT or BOTTOM to mean the full edge. "
