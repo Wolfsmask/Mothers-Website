@@ -132,13 +132,23 @@ than floating.
 ### You have to look at every result
 
 This is the important part. The model sometimes removes **part of the item**,
-and there is no way to detect it automatically -- that was tested. The
-measurements that look like they should catch it do not: the vintage plate
-came out cut in half while scoring better on every geometric check than the
-pumpkin basket, which came out perfect.
+and there is no way to detect it automatically. Three different checks were
+tried, and all three failed:
+
+1. **Shape measurements** (how much of its own outline the item fills). The
+   vintage plate came out cut in half while scoring *better* than the pumpkin
+   basket, which came out perfect.
+2. **Straight-edge detection**, on the idea that a cut leaves a ruler-straight
+   line. It flags almost everything, because a box of fuel and a packaged
+   tablecloth have straight edges for the honest reason that they are
+   rectangles.
+3. **Touching the frame edge.** This one does work, but only for a different
+   problem: it tells you the *photographer* cut the item off, not that the
+   software did.
 
 So: run it, then open the output folder and look at each photo. If an item is
-missing a piece, the photo needs a different treatment.
+missing a piece, the photo needs a different treatment. There is no shortcut,
+and anyone who tells you there is has not checked.
 
 ### When a cut-out loses part of the item
 
@@ -199,6 +209,26 @@ empty space around a small item.
 What it cannot fix: an item still inside a plastic bag, a photo too dark to
 show the colours, or a background so cluttered it runs behind the item. Those
 need the item taking out and photographing again.
+
+---
+
+## Two photos where the camera cut the item
+
+Different from the software cutting it, and worse, because nothing can fix it:
+in these two the item already ran off the edge when the photo was taken.
+
+- **The chafer fuel box** -- the right end of the box is outside the frame.
+- **The drink dispensers** -- the top-right dispenser is cut down its side.
+
+The missing part was never photographed, so there is nothing to recover. They
+are on the site because an honest photo of most of the item still beats no
+photo, but both want retaking, and it is two photos.
+
+To be plain about the alternative: the missing parts could not be invented.
+Drawing in the end of a box that nobody photographed would show a customer
+something that is not the item they are booking, which is the same objection
+that kept the AI-generated chafer racks off the site. Step back half a metre
+and take the photo again instead.
 
 ---
 
