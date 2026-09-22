@@ -314,6 +314,28 @@ def _segmentation_session(name: str = "u2net"):
     return _SESSION[1]
 
 
+def fill_holes(mask: Image.Image) -> Image.Image:
+    """
+    Close gaps punched in the middle of the item. Background is whatever the
+    outside connects to, so anything enclosed by the item belongs to the item.
+    """
+    arr = np.asarray(mask) > 32
+    h, w = arr.shape
+    # Flood the background inward from a one-pixel border.
+    padded = np.zeros((h + 2, w + 2), np.uint8)
+    padded[1:-1, 1:-1] = np.where(arr, 0, 255)
+    padded[0, :] = padded[-1, :] = padded[:, 0] = padded[:, -1] = 255
+    work = Image.fromarray(np.dstack([padded] * 3), "RGB")
+    ImageDraw.floodfill(work, (0, 0), (255, 0, 255), thresh=0)
+    px = np.asarray(work)
+    outside = (px[:, :, 0] == 255) & (px[:, :, 1] == 0)
+    filled = ~outside[1:-1, 1:-1]
+
+    out = np.asarray(mask).copy()
+    out[filled & ~arr] = 255
+    return Image.fromarray(out, mode="L")
+
+
 def studio_alpha(img: Image.Image, model: str = "u2net") -> Image.Image | None:
     """
     Cut the item out of its surroundings using a segmentation model, which
@@ -326,11 +348,24 @@ def studio_alpha(img: Image.Image, model: str = "u2net") -> Image.Image | None:
     """
     from rembg import remove
 
-    mask = remove(
-        img, session=_segmentation_session(model),
-        only_mask=True, post_process_mask=True,
-    ).convert("L")
+    def run(name):
+        return remove(
+            img, session=_segmentation_session(name),
+            only_mask=True, post_process_mask=True,
+        ).convert("L")
 
+    if model == "both":
+        # The two models clip in different places, so the union keeps more of
+        # the item than either alone. Erring toward keeping is the right
+        # direction: a little stray background is fixable, a missing corner of
+        # the item is not.
+        a = np.asarray(run("u2net")).astype(np.uint16)
+        b = np.asarray(run("isnet-general-use")).astype(np.uint16)
+        mask = Image.fromarray(np.maximum(a, b).astype(np.uint8), mode="L")
+    else:
+        mask = run(model)
+
+    mask = fill_holes(mask)
     arr = np.asarray(mask)
     solid = arr > 32
     coverage = float(solid.mean())
@@ -666,7 +701,20 @@ def process(path: Path, args, bg_colour, base: str) -> list[str]:
     if args.lift:
         img = lift_exposure(img)
 
-    if args.studio:
+    if args.ellipse:
+        # A round item -- a plate, a charger -- is hard for a segmentation
+        # model when it is a similar colour to the surface under it, and the
+        # model tends to cut a slice out of it. The shape is known, so cut it
+        # geometrically instead: an ellipse inscribed in the crop. It cannot
+        # take a bite out of the item, and the crop decides the rest.
+        mask = Image.new("L", img.size, 0)
+        inset = max(1, int(min(img.size) * 0.004))
+        ImageDraw.Draw(mask).ellipse(
+            [inset, inset, img.width - 1 - inset, img.height - 1 - inset], fill=255
+        )
+        mask = mask.filter(ImageFilter.GaussianBlur(1.4))
+        note = "cut to an ellipse"
+    elif args.studio:
         mask = studio_alpha(img, args.model)
         note = "studio cut-out" if mask is not None else "cut-out not confident, background kept"
     elif not args.no_knockout:
@@ -712,7 +760,7 @@ def process(path: Path, args, bg_colour, base: str) -> list[str]:
     for index, width in enumerate(args.sizes):
         square = compose_square(
             img, mask, width, bg_colour, args.padding, not args.no_shadow,
-            studio=args.studio,
+            studio=args.studio or args.ellipse,
         )
         suffix = "" if index == 0 else f"@{width}"
 
@@ -769,9 +817,14 @@ def main() -> int:
                              "colour-matching default, and keeps the background when it "
                              "is not confident")
     parser.add_argument("--model", default="u2net",
-                        help="segmentation model for --studio: u2net (default) or "
-                             "isnet-general-use, which handles flat and graphic objects "
-                             "better. Try both and keep whichever preserves the item")
+                        help="segmentation model for --studio: u2net (default), "
+                             "isnet-general-use (better on flat and graphic objects), or "
+                             "both, which combines them and keeps whatever either one "
+                             "found. Use both when a cut-out is losing part of the item")
+    parser.add_argument("--ellipse", action="store_true",
+                        help="cut a round item to an ellipse filling the crop, instead of "
+                             "using the model. For plates and chargers, where the model "
+                             "tends to slice a piece off. Crop tight to the item first")
     parser.add_argument("--straighten", action="store_true",
                         help="level an item photographed at a slant. Skipped for round "
                              "or irregular items, where there is no angle to correct")

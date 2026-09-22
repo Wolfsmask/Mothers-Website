@@ -161,11 +161,22 @@ Two things to try, in this order:
    what the model sees. The same tables photo lost the wooden table again with
    `--lift` on, and kept it with `--lift` off.
 
-If neither works, use `--no-knockout --lift` instead. The background stays, but
-the photo is still brightened, straightened and cropped, and the item is
-whole. Of the seventeen photos on the site, six are done this way, because
-both models clipped them: the plates, the floor mat, the photo booth props,
-the plastic table covers and the coconut cups.
+3. **Combine both models** with `--model both`. They clip in different places,
+   so keeping whatever either one found recovers the item. This rescued the
+   cake toppers, the ivory linens and the plastic table covers, all three of
+   which one model alone had sliced into.
+
+If none of that works, use `--no-knockout --lift` with a tight `--crop`
+instead. The background stays, but the photo is brightened and cropped close
+to the item, which reads as a deliberate close-up rather than a snapshot. Five
+of the seventeen are done this way: both plates, the coconut cups, the floor
+mat and the photo booth props.
+
+Those five have something in common worth knowing. **The item runs off the
+edge of its own photo** -- both plates are wider than the frame they were shot
+in, so there is no complete item to cut out in the first place. A cut-out
+would only slice them further. They are the five to retake, and standing back
+half a metre fixes all of them.
 
 An honest photo with a dull background beats a clean cut-out with a bite
 taken out of the item.
