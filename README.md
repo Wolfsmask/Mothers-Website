@@ -27,12 +27,17 @@ Page wording lives in the `.html` files directly.
 
 ---
 
-## Seeing what people look at
+## Seeing what people are interested in
 
-`ANALYTICS.md` covers setting up free Google Analytics: which tabs get
-visited, how long people stay, and which rental items they open for a closer
-look. The code is already in place and does nothing until a Measurement ID is
-added to `assets/site-config.js`.
+**This already works and needs no setup.** When a visitor opens a rental item
+and clicks "Ask about this item", the enquiry that arrives names that item in
+its subject line, so the inbox itself is the record of what people want.
+Searching for `Rental Inquiry` shows which items get asked about.
+
+For visitor numbers on top of that, `ANALYTICS.md` covers two options, both
+off until switched on in `assets/site-config.js`: a cookieless counter that
+comes free with Cloudflare hosting and needs no consent prompt, or Google
+Analytics if the extra detail is wanted.
 
 ## The rental catalog
 

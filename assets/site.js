@@ -75,6 +75,16 @@
     phoneNodes.forEach(el => el.closest("[data-optional-contact]")?.setAttribute("hidden",""));
   }
 
+  // An enquiry that arrives naming the item is the simplest possible record of
+  // what people want: it lands in the inbox, needs no analytics account, and
+  // can be searched later. The preview's button passes the name in the URL.
+  const enquiryItem = (() => {
+    try {
+      const value = new URLSearchParams(window.location.search).get("item");
+      return value ? value.slice(0, 120) : "";
+    } catch (e) { return ""; }
+  })();
+
   // Inquiry form only appears once a real email exists.
   const inquiryForm = document.querySelector("[data-inquiry-form]");
   if (inquiryForm) {
@@ -82,10 +92,25 @@
       inquiryForm.setAttribute("hidden","");
       document.querySelector("[data-contact-pending]")?.removeAttribute("hidden");
     } else {
+      if (enquiryItem) {
+        const message = document.getElementById("message");
+        if (message && !message.value) {
+          message.value = `I'm interested in: ${enquiryItem}\n\n`;
+        }
+        const note = inquiryForm.querySelector(".form-note");
+        if (note) {
+          note.textContent = `Asking about: ${enquiryItem}`;
+          note.classList.add("form-note--item");
+        }
+        track("rental_enquiry_started", { item_name: enquiryItem });
+      }
+
       inquiryForm.addEventListener("submit", e => {
         e.preventDefault();
         const get = id => document.getElementById(id)?.value.trim() || "";
-        const subject = `Event Inquiry - ${get("eventType") || "Event"} - ${get("name")}`;
+        const subject = enquiryItem
+          ? `Rental Inquiry - ${enquiryItem} - ${get("name")}`
+          : `Event Inquiry - ${get("eventType") || "Event"} - ${get("name")}`;
         const body = [
           "Hello Untamed Entertainment!",
           "",
@@ -97,6 +122,7 @@
           `EVENT DATE: ${get("eventDate") || "Not decided yet"}`,
           `LOCATION: ${get("location") || "Not decided yet"}`,
           `SERVICE: ${get("service") || "Not sure yet"}`,
+          ...(enquiryItem ? [`RENTAL ITEM: ${enquiryItem}`] : []),
           "",
           "EVENT DETAILS:",
           get("message") || "No additional details provided yet."
@@ -374,7 +400,7 @@
           <h2>${escapeHtml(item.name)}</h2>
           ${item.detail ? `<p class="preview__detail">${escapeHtml(item.detail)}</p>` : ""}
           ${thumbs}
-          <a class="button gold" href="index.html#contact">Ask about this item &rarr;</a>
+          <a class="button gold" href="index.html?item=${encodeURIComponent(item.name)}#contact">Ask about this item &rarr;</a>
         </div>`;
 
       dialog.querySelector(".preview__close").addEventListener("click", closePreview);
@@ -399,6 +425,17 @@
       item_name: item.name,
       item_category: item.category
     });
+  }
+
+  // Cloudflare Web Analytics counts visitors and pages without cookies or any
+  // stored identifier, so there is nothing to ask permission for and no
+  // consent prompt appears. It is disclosed in the privacy policy regardless.
+  if (cfg.cloudflareToken) {
+    const beacon = document.createElement("script");
+    beacon.defer = true;
+    beacon.src = "https://static.cloudflareinsights.com/beacon.min.js";
+    beacon.setAttribute("data-cf-beacon", JSON.stringify({ token: cfg.cloudflareToken }));
+    document.head.appendChild(beacon);
   }
 
   // Analytics loads only after a real Measurement ID is configured and the visitor opts in.

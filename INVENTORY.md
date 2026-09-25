@@ -90,11 +90,13 @@ The sheet has **"insurance?"** written at the top — her own note, not mine.
   - Peach / pinkish
   - White
   - Halloween
-- Tablecloths, plastic
-  - White
-  - Patriotic
-  - Halloween
-  - Confetti
+- Tablecloths, plastic -- photographed since, and the range is much wider than
+  the sheet recorded. Rectangle, 54in x 108in, in ivory, red, pink, magenta,
+  purple, green, lime, gold, rainbow, pastel and confetti
+- Stay-on plastic cover, white, 30in x 96in, elastic edge
+- Patriotic stars cover
+- Halloween covers: cats and bats plastic cover, plus two round PEVA
+  tablecloths (ghosts, and "Witch's Brew" with pumpkins and spiders)
 
 ## Tableware
 
@@ -213,7 +215,10 @@ Items visible in the stock photos, confirming or adding to the written sheets:
    chafer racks carry an "AI-generated content" watermark, so they do not show
    the actual racks and cannot be used to advertise them. A real photograph of
    the racks is still needed.
-12. **Items still without a photograph:** risers, glassware, mugs, clear
+12. **Thirty photographs are now on the site**, covering sixteen catalog
+   items. The table cover colour range came later and is the best-photographed
+   part of the stock: eleven colours, each a clean cut-out.
+13. **Items still without a photograph:** risers, glassware, mugs, clear
    buckets, hanging signs, direction arrows, quote signs, rope light,
    extension cords, backdrops, the photo station set, the wood clip board,
    boxed paper letters, vases, wood crates, tea light candles, the cotton

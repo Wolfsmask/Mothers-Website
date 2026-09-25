@@ -405,3 +405,5 @@ footer{background:#0f0e0c;color:#fff;padding:34px 0 25px}
 .content-card--link:hover{transform:translateY(-3px);box-shadow:0 18px 44px rgba(52,35,16,.12)}
 .content-card--link h2{color:var(--ink)}
 .content-card--link:hover h2{color:#9a641f}
+
+.form-note--item{font-weight:800;color:#9a641f}

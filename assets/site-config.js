@@ -14,8 +14,17 @@ window.UNTAMED_CONFIG = {
   googleBusinessProfile: "",
   googleReviewUrl: "",
 
-  // Add your real GA4 Measurement ID after creating Analytics, e.g. G-XXXXXXXXXX.
-  // Analytics will not load while this is blank.
+  // VISITOR NUMBERS -- see ANALYTICS.md. Both are optional and both stay off
+  // while blank. You only need one.
+
+  // The simple option. If the site is hosted on Cloudflare Pages, turn on Web
+  // Analytics in the same dashboard and paste the token here. It counts
+  // visitors and pages without cookies, so it needs no consent prompt.
+  cloudflareToken: "",
+
+  // The detailed option. A Google Analytics Measurement ID, e.g. G-XXXXXXXXXX.
+  // Adds time-on-page and which rental items get opened, at the cost of a
+  // consent prompt and a more complicated dashboard.
   gaMeasurementId: "",
 
   // Add only genuine client testimonials.
@@ -51,8 +60,15 @@ window.UNTAMED_CONFIG = {
       category: "Linens & Table Covers",
       blurb: "Fabric and disposable, in plain colours and seasonal prints.",
       items: [
-        { name: "Fabric tablecloths", detail: "Royal blue, peach, white, Halloween", image: "ivory-linens" },
-        { name: "Plastic table covers", detail: "White stay-on, patriotic, Halloween, confetti", images: ["plastic-table-covers", "halloween-table-cover"] }
+        { name: "Fabric tablecloths", detail: "Royal blue, peach, white and ivory", image: "ivory-linens" },
+        { name: "Plastic table covers", detail: "Rectangle, 54in x 108in. Ivory, red, pink, magenta, purple, green, lime, gold, rainbow, pastel and confetti",
+          images: ["table-cover-ivory", "table-cover-red", "table-cover-pink", "table-cover-magenta",
+                   "table-cover-purple", "table-cover-green", "table-cover-lime", "table-cover-gold",
+                   "table-cover-rainbow", "table-cover-pastel", "table-cover-confetti"] },
+        { name: "Stay-on & patriotic covers", detail: "White stay-on with elastic edge, 30in x 96in, and patriotic stars",
+          image: "plastic-table-covers" },
+        { name: "Halloween table covers", detail: "Cats and bats plastic cover, plus round ghost and Witch's Brew tablecloths",
+          images: ["halloween-table-cover", "tablecloth-halloween-ghosts", "tablecloth-halloween-witches-brew"] }
       ]
     },
     {
