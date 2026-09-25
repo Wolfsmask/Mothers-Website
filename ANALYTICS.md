@@ -1,106 +1,110 @@
 # Seeing what people are interested in
 
-Three ways, easiest first. **The first one is already working and needs
-nothing at all.** Most small businesses never need more than the first two.
+Nothing here needs an account, and nothing needs installing on her computer.
 
 ---
-
-## 1. Your inbox (nothing to set up)
-
-When someone opens a rental item on the website and clicks **Ask about this
-item**, the message they send now names that item. The email arrives with a
-subject line like:
-
-> **Rental Inquiry - Sterno chafer sets - Megan Wright**
-
-and the item repeated inside the message.
-
-So your email is already a record of what people want. Search your inbox for
-`Rental Inquiry` and you can see, at a glance, which items people ask about
-and how often. If six of the last ten are chafer sets, that is your answer.
-
-No account, no setup, no dashboard. This works from the moment the site is
-live.
-
-**What it tells you:** which items are wanted enough that someone actually got
-in touch — the strongest signal there is, because it cost them effort.
-
-**What it does not tell you:** how many people looked and did not write.
-
----
-
-## 2. Visitor numbers, through your website host
-
-You have to put the website somewhere, and that means one account no matter
-what. So use a host that shows you the numbers in the same place.
-
-**Cloudflare Pages** is free, and its Web Analytics is free and built into the
-same dashboard. That is one account in total, not two.
-
-1. Sign up at **pages.cloudflare.com** and upload the website folder.
-2. In the dashboard, open **Web Analytics** and turn it on for the site.
-3. It gives you a short token. Open `assets/site-config.js` and paste it in:
-
-   ```js
-   cloudflareToken: "your-token-here",
-   ```
-
-4. Upload the site again.
-
-**What you get:** how many people visited, which pages they went to, where
-they came from (Google, Facebook, a link someone shared), and what days are
-busy. That answers "which tabs do people use".
-
-**Why this one:** it counts people without cookies and without storing
-anything on their computer, so **no consent pop-up appears** and the site
-stays simple. Nothing to install.
-
-Free tiers change, so check what is current when you sign up.
-
----
-
-## 3. Google Analytics (only if you want the detail)
-
-Already wired in; it stays off until you add an ID. Use it only if you want
-**time spent on each page** and **which items get opened without anyone
-writing in** — that is the one thing the first two cannot give you.
-
-The costs are real: a consent pop-up appears on the site, visitors who decline
-are invisible, and the dashboard takes a while to learn.
-
-1. Go to **analytics.google.com**, sign in with the business Google account.
-2. Create a property, choose **Web**, enter the website address.
-3. Copy the **Measurement ID** (starts with `G-`) into `assets/site-config.js`:
-
-   ```js
-   gaMeasurementId: "G-ABC1234XYZ",
-   ```
-
-Where to look afterwards:
-
-- **Reports → Engagement → Pages and screens** — visits and average time on
-  each page.
-- **Reports → Engagement → Events** — look for `rental_preview` and click into
-  it to see which items by name.
-
-You can run this alongside Cloudflare, or instead of it. You do not need both.
-
----
-
-## Before you trust any of the numbers
-
-- **Nothing records until the site is live.** Opening the files from your own
-  computer does not count.
-- **Your own visits count too.** Early on, most of the traffic will be you.
-- **Small numbers mean nothing.** Three views of one item and one of another
-  is not evidence. Give it a few weeks.
-- **Google Analytics only counts people who accept the prompt**, so real
-  traffic is always higher than it reports. Cloudflare counts everyone.
-- **The privacy policy already covers all of this.** If you change what is
-  tracked, `privacy.html` needs updating too.
 
 ## The short version
 
-Do nothing, and your inbox already tells you which items people ask about.
-Add the Cloudflare token when you want visitor numbers. Only bother with
-Google Analytics if you find yourself wanting more than that.
+While the website is running on your PC, it keeps a private record of which
+pages and which rental items people looked at. One command turns that into a
+**single report file** you can email her. She double-clicks it and it opens.
+That is the whole thing.
+
+---
+
+## Running the website, and recording visits
+
+Instead of whatever you use now, start it with:
+
+    python3 scripts/serve.py
+
+It prints two addresses: one for that computer, and one that other devices on
+the same wifi can use. Leave the window open; press Ctrl+C to stop.
+
+While it runs it writes to `data/events.jsonl` — one line per page opened and
+per rental item someone clicked to enlarge.
+
+**What is recorded:** the time, which page, and which item. That is all. No IP
+addresses, no names, no device details. Nothing leaves your computer.
+
+## Making the report for her
+
+Any time you want an update:
+
+    python3 scripts/build_report.py
+
+That writes **`report.html`** in the project folder. Email it, text it, put it
+on a memory stick — she double-clicks it and it opens in her browser.
+
+It is one self-contained file. It needs no internet, no account, no software,
+and no login. It works on any computer or phone that can open a web page.
+
+Useful options:
+
+    python3 scripts/build_report.py --days 30      # only the last month
+    python3 scripts/build_report.py --out ~/Desktop/september.html
+
+Send her a fresh one whenever it is worth looking at — monthly is plenty.
+
+## What the report shows her
+
+- **Which rental items people opened**, ranked. This is the one that answers
+  "what should I get more of".
+- **Which pages people visited.**
+- **Which items people started an enquiry about.**
+- Headline numbers, and a plain-English note on how to read them.
+
+---
+
+## Her inbox is the other half, and needs nothing at all
+
+When someone opens an item and clicks **Ask about this item**, the enquiry
+they send names that item in the subject line:
+
+> **Rental Inquiry — Sterno chafer sets — Megan Wright**
+
+So her email already records which items people care enough about to write in
+about. Searching for `Rental Inquiry` shows them. That is the strongest signal
+there is, because writing in costs the visitor effort — and it works whether
+or not anyone ever runs the report.
+
+---
+
+## The honest catch about hosting from a home PC
+
+The website is only reachable **while that computer is switched on and awake**,
+and unless the router has been set up to allow it, only devices on the same
+wifi can open it at all. Friends and family on the same network, yes; a
+customer who finds it on Google, no.
+
+So expect the report to be quiet at first. That is the hosting, not the
+website.
+
+When it is time for the business to be genuinely findable, a free host such as
+Cloudflare Pages or Netlify runs it 24 hours a day on a real web address, and
+`assets/site-config.js` already has a `cloudflareToken` setting for the free
+cookieless counter that comes with it. Nothing about the website has to
+change. Until then, the local recorder does the same job on your machine.
+
+---
+
+## If you would rather use Google Analytics
+
+Still supported, still off until switched on. Put a Measurement ID from
+analytics.google.com into `gaMeasurementId` in `assets/site-config.js`.
+
+It adds time-on-page, at the cost of a consent pop-up on the site, invisibility
+for everyone who declines it, and an account and dashboard to learn. For a
+business this size the report file is easier and tells you the same things.
+
+---
+
+## Reading any of it sensibly
+
+- **Your own visits count.** Early on most of them will be you or her.
+- **Small numbers mean nothing.** Three of one item and one of another is not
+  evidence. Give it a few weeks.
+- **Only visits while the site was actually running are counted.**
+- **The privacy policy already covers this.** If you change what is recorded,
+  update `privacy.html` too.

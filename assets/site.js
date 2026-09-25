@@ -2,6 +2,36 @@
 (() => {
   const cfg = window.UNTAMED_CONFIG || {};
 
+  // Sending to the local recorder is tried once per page. If the site is on a
+  // normal web host there is nothing listening, the first attempt fails, and
+  // it stops trying rather than producing an error for every click.
+  let localRecorder = true;
+
+  function recordLocally(kind, item) {
+    if (!localRecorder) return;
+    try {
+      fetch("/_track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        keepalive: true,
+        body: JSON.stringify({
+          kind: kind,
+          page: window.location.pathname.split("/").pop() || "index.html",
+          item: item || ""
+        })
+      }).catch(() => { localRecorder = false; });
+    } catch (e) {
+      localRecorder = false;
+    }
+  }
+
+  function track(eventName, params) {
+    recordLocally(eventName, params && params.item_name);
+    if (typeof window.gtag !== "function") return;
+    try { window.gtag("event", eventName, params || {}); } catch (e) { /* never break the page for a stat */ }
+  }
+
+
   // Mobile navigation.
   const menuButton = document.querySelector("[data-menu-button]");
   const navLinks = document.querySelector("[data-nav-links]");
@@ -213,11 +243,6 @@
   // ---- Analytics helper -------------------------------------------------
   // Does nothing unless Analytics is both configured and allowed by the
   // visitor, so a visitor who declined is never recorded.
-  function track(eventName, params) {
-    if (typeof window.gtag !== "function") return;
-    try { window.gtag("event", eventName, params || {}); } catch (e) { /* never break the page for a stat */ }
-  }
-
   // Which navigation tabs get used. Page views and time on page are recorded
   // by Analytics itself; this adds which link people took to get there.
   document.querySelectorAll("[data-nav-links] a").forEach(link => {

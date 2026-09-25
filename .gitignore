@@ -20,3 +20,7 @@ node_modules/
 # Raw, unprocessed source photos (large; keep locally, not in git)
 images/raw/*
 !images/raw/.gitkeep
+
+# Visit record and the report built from it -- generated locally, not source
+data/
+report.html

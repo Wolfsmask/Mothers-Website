@@ -34,10 +34,13 @@ and clicks "Ask about this item", the enquiry that arrives names that item in
 its subject line, so the inbox itself is the record of what people want.
 Searching for `Rental Inquiry` shows which items get asked about.
 
-For visitor numbers on top of that, `ANALYTICS.md` covers two options, both
-off until switched on in `assets/site-config.js`: a cookieless counter that
-comes free with Cloudflare hosting and needs no consent prompt, or Google
-Analytics if the extra detail is wanted.
+For visitor numbers, run the site with `python3 scripts/serve.py` instead of a
+plain web server. It keeps a private local record of which pages and items get
+looked at, and `python3 scripts/build_report.py` turns that into a single
+`report.html` file that can be emailed to anyone and opened by double-clicking
+— no account, no install, no internet needed to read it.
+
+`ANALYTICS.md` covers all of it, plus the hosted options for later.
 
 ## The rental catalog
 
@@ -155,6 +158,8 @@ domain is final, generate `sitemap.xml` with absolute URLs and add a
     assets/site.css         Styling, colours at the very top
     assets/site.js          Page behaviour
     scripts/process_photos.py   Photo processing
+    scripts/serve.py            Run the site locally and record visits
+    scripts/build_report.py     Turn that record into report.html
     images/raw/             Put original photos here (not committed)
     assets/rentals/         Catalog item photos
     assets/gallery/         Event photos
