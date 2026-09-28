@@ -38,6 +38,13 @@ window.UNTAMED_CONFIG = {
     // { service: "Day-of Coordination", price: "$___", note: "Starting at" }
   ],
 
+  // Photos are currently switched OFF across the rental catalog. The item
+  // names and descriptions still show; the pictures do not.
+  // To put them back: move the folder photos-not-in-use/rentals back to
+  // assets/rentals, then set this to true. Nothing else needs changing --
+  // every photo is still listed against its item below.
+  showPhotos: false,
+
   // RENTAL CATALOG
   // Transcribed from the handwritten inventory sheets. See INVENTORY.md for
   // the readings that still need confirming.

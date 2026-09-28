@@ -52,9 +52,15 @@ can be added a few at a time without the page ever looking half-finished.
 Set `hidden: true` on any item or category that is not currently for rent,
 rather than deleting it, so it can be brought back later.
 
-**Photos and previews.** An item with a photo becomes clickable: visitors get
-a larger preview with the name and details before they enquire. Give an item
-one photo with `image: "file-name"`, or several with
+**Photos are currently switched off.** `showPhotos: false` in
+`assets/site-config.js` hides every catalog photo, and the 30 processed images
+are parked in `photos-not-in-use/`. Nothing was lost — each one is still listed
+against its item — and `photos-not-in-use/README.md` has the two steps to put
+them back.
+
+**When they are on**, an item with a photo becomes clickable: visitors get a
+larger preview with the name and details before they enquire. Give an item one
+photo with `image: "file-name"`, or several with
 `images: ["front", "back", "in-use"]`, and the preview gains thumbnails to
 switch between them. Items with no photo stay as plain text entries.
 

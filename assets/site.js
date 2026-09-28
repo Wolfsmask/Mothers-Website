@@ -297,6 +297,9 @@
   const previewable = [];
 
   function itemPhotos(item) {
+    // One switch hides every catalog photo without touching the lists, so the
+    // pictures can be put back later without re-entering any of them.
+    if (cfg.showPhotos === false) return [];
     if (Array.isArray(item.images)) return item.images.filter(Boolean);
     if (item.image) return [item.image];
     return [];
