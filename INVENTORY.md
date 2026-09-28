@@ -177,12 +177,15 @@ Items visible in the stock photos, confirming or adding to the written sheets:
 
 ## Open questions
 
-1. **Business name.** The rental agreement is headed **Table Time KC**, but
-   the website is built as **Untamed Entertainment LC**. Which is correct, and
-   how do the two relate?
-2. **Phone number.** The rental agreement gives **913-296-3489**. The website
-   config has **(913) 777-4929**. The email matches on both
-   (bjolleenm@gmail.com).
+1. **Business name -- RESOLVED.** **Untamed Entertainment LC** is correct, as
+   confirmed by the owner. The website was already right; it is the rental
+   agreement that is out of date, still headed "Table Time KC".
+   **Action: update the rental agreement** so the name on the contract matches
+   the name customers booked through.
+2. **Phone number -- RESOLVED.** **(913) 777-4929** is correct, as confirmed.
+   The website was already right. The rental agreement's 913-296-3489 is the
+   wrong number. **Action: correct it on the agreement**, or a customer trying
+   to reach her from the paperwork will not get through.
 3. **Scope of the rental agreement.** It is written specifically around
    tables — "$100 per standard table", "tables must be returned clean". The
    inventory above is far broader, and includes fire, food service and

@@ -6,7 +6,8 @@ Nothing here needs an account, and nothing needs installing on her computer.
 
 ## What she does
 
-1. She gets an email from you with a **PDF attached**.
+1. **At 5pm every day an email arrives** at bjolleen2@gmail.com with a PDF
+   attached.
 2. She taps it.
 3. She reads it.
 
@@ -14,11 +15,77 @@ That is all of it. Nothing to install, no account, no password, no website to
 log in to. It works on her phone, her tablet, or any computer, and it works
 with no internet once it has arrived.
 
-The PDF has four big numbers at the top, then a chart of which rental items
-people opened most, and a chart of which pages they visited. It says in plain
-words how to read them.
+The first line of the PDF says it all, in a gold band:
 
-**Everything else on this page is your side of it**, and it is two commands.
+> **6 visits today. Most looked at: Folding chairs.**
+
+Under that are four big numbers, then a chart of which rental items people
+opened most, and one of which pages they visited. It says in plain words how
+to read them. One page, no jargon.
+
+**Everything else on this page is your side of it.**
+
+---
+
+## Setting up the daily 5pm email (once)
+
+### 1. Get a Gmail app password
+
+A normal Gmail password will not work for this; Google requires an *app
+password*, which is a 16-character code made just for this one job and can be
+revoked at any time. It is free and is not a new account.
+
+1. Go to **myaccount.google.com/security** on the Gmail account that will send
+   the report.
+2. Turn on **2-Step Verification** if it is not on. App passwords do not exist
+   without it.
+3. Search that page for **App passwords**, create one, and name it anything.
+4. Copy the 16 characters it shows you. You cannot see it again afterwards.
+
+### 2. Put it in the settings file
+
+    python3 scripts/email_report.py
+
+The first run creates **`email-settings.json`**. Open it and fill in `from`
+(the sending Gmail address) and `app_password`. The `to` address is already
+set to bjolleen2@gmail.com.
+
+**That file holds a password.** It is excluded from git and should not be
+emailed or shared. If it ever leaks, delete that app password in the Google
+settings and make a new one.
+
+### 3. Send one now to check
+
+    python3 scripts/email_report.py --test
+
+Check her inbox, and the spam folder the first time.
+
+### 4. Make it run at 5pm daily
+
+**Windows** &mdash; open **Task Scheduler**, then Create Basic Task:
+
+- Name: `Untamed website report`
+- Trigger: **Daily**, start time **5:00 PM**
+- Action: **Start a program**
+- Program: browse to `scripts\daily-report.bat` in this folder
+- Finish, then open the task's Properties and tick
+  **Run task as soon as possible after a scheduled start is missed**, so a day
+  the PC was off still sends when it comes back on.
+
+**Mac or Linux** &mdash; run `crontab -e` and add one line:
+
+    0 17 * * *  /full/path/to/scripts/daily-report.sh
+
+### The catch worth knowing
+
+**The computer has to be on and awake at 5pm.** If it is asleep or off, no
+email goes that day (on Windows the missed-run setting above sends it late
+instead). Nothing is lost either way &mdash; the visits are still recorded and
+appear in the next report.
+
+If you would rather she was not emailed on quiet days, set
+`"skip_if_no_visits": true` in `email-settings.json` and no email is sent on a
+day with no visits at all.
 
 ---
 

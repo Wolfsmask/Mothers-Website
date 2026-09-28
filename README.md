@@ -159,7 +159,10 @@ domain is final, generate `sitemap.xml` with absolute URLs and add a
     assets/site.js          Page behaviour
     scripts/process_photos.py   Photo processing
     scripts/serve.py            Run the site locally and record visits
-    scripts/build_report.py     Turn that record into report.html
+    scripts/build_report.py     Turn that record into report.pdf
+    scripts/email_report.py     Build it and email it (the daily 5pm job)
+    scripts/daily-report.bat    Windows Task Scheduler points at this
+    scripts/daily-report.sh     cron points at this on Mac or Linux
     images/raw/             Put original photos here (not committed)
     assets/rentals/         Catalog item photos
     assets/gallery/         Event photos

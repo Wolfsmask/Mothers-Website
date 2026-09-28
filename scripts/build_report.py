@@ -137,8 +137,27 @@ def build(rows, days):
     page_pairs = page_views.most_common()
     enq_pairs = enquiries.most_common()
 
+    # A daily email needs the answer in the first line, not after four charts.
+    today = datetime.now(timezone.utc).date()
+    today_rows = [r for r in rows if r["_when"].date() == today]
+    today_pages = sum(1 for r in today_rows if r.get("kind") == "page_view")
+    today_items = Counter(
+        r["item"] for r in today_rows
+        if r.get("kind") == "rental_preview" and r.get("item")
+    )
+
+    if today_pages == 0:
+        today_line = "No visits today."
+    else:
+        visits = "1 visit" if today_pages == 1 else f"{today_pages} visits"
+        if today_items:
+            best = today_items.most_common(1)[0][0]
+            today_line = f"{visits} today. Most looked at: <strong>{html.escape(best)}</strong>."
+        else:
+            today_line = f"{visits} today, but nobody opened a rental item."
+
     headline = (
-        f"Most looked at: <strong>{html.escape(item_pairs[0][0])}</strong>"
+        f"All time, most looked at: <strong>{html.escape(item_pairs[0][0])}</strong>"
         if item_pairs else "No rental items opened yet"
     )
 
@@ -197,6 +216,9 @@ def build(rows, days):
   .tile .n {{ font-size: 2rem; font-weight: 700; letter-spacing: -.02em; }}
   .tile .k {{ color: var(--text-secondary); font-size: .85rem; }}
 
+  .today {{ background: var(--bar); color: #fff; border-radius: 12px;
+            padding: 15px 20px; margin: 0 0 20px; font-size: 1.15rem; font-weight: 600; }}
+  .today strong {{ font-weight: 800; }}
   .headline {{ background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--bar);
                border-radius: 12px; padding: 14px 18px; margin: 20px 0 0; font-size: 1.05rem; }}
 
@@ -237,6 +259,7 @@ def build(rows, days):
       border-color: #ddd; background: #fff;
       break-inside: avoid; page-break-inside: avoid;
     }}
+    .today {{ background: #9a641f !important; color: #fff !important; }}
     .bar-fill {{ background: #9a641f !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }}
     .bar-track {{ background: #eee !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }}
     h2 {{ break-after: avoid; page-break-after: avoid; }}
@@ -250,6 +273,8 @@ def build(rows, days):
   <h1>Website Report</h1>
   <p class="sub">Untamed Entertainment LC &middot; {html.escape(covered)}</p>
   <p class="stamp">Made on {datetime.now():%-d %B %Y at %-I:%M %p}{" &middot; last " + str(days) + " days only" if days else ""}</p>
+
+  <div class="today">{today_line}</div>
 
   <div class="tiles">
     <div class="tile"><div class="n">{total_pages}</div><div class="k">Page visits</div></div>

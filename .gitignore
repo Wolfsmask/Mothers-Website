@@ -25,3 +25,6 @@ images/raw/*
 data/
 report.html
 report.pdf
+
+# Holds a mail password. Never commit this.
+email-settings.json
