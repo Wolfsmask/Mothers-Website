@@ -36,9 +36,9 @@ Searching for `Rental Inquiry` shows which items get asked about.
 
 For visitor numbers, run the site with `python3 scripts/serve.py` instead of a
 plain web server. It keeps a private local record of which pages and items get
-looked at, and `python3 scripts/build_report.py` turns that into a single
-`report.html` file that can be emailed to anyone and opened by double-clicking
-— no account, no install, no internet needed to read it.
+looked at, and `python3 scripts/build_report.py` turns that into a **`report.pdf`** you
+can email to anyone. They tap it and read it — no account, no install, no
+login. A `report.html` version is written alongside it for reading on screen.
 
 `ANALYTICS.md` covers all of it, plus the hosted options for later.
 

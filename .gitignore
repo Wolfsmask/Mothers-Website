@@ -24,3 +24,4 @@ images/raw/*
 # Visit record and the report built from it -- generated locally, not source
 data/
 report.html
+report.pdf

@@ -4,12 +4,21 @@ Nothing here needs an account, and nothing needs installing on her computer.
 
 ---
 
-## The short version
+## What she does
 
-While the website is running on your PC, it keeps a private record of which
-pages and which rental items people looked at. One command turns that into a
-**single report file** you can email her. She double-clicks it and it opens.
-That is the whole thing.
+1. She gets an email from you with a **PDF attached**.
+2. She taps it.
+3. She reads it.
+
+That is all of it. Nothing to install, no account, no password, no website to
+log in to. It works on her phone, her tablet, or any computer, and it works
+with no internet once it has arrived.
+
+The PDF has four big numbers at the top, then a chart of which rental items
+people opened most, and a chart of which pages they visited. It says in plain
+words how to read them.
+
+**Everything else on this page is your side of it**, and it is two commands.
 
 ---
 
@@ -30,24 +39,30 @@ addresses, no names, no device details. Nothing leaves your computer.
 
 ## Making the report for her
 
-Any time you want an update:
+Any time you want to send her an update:
 
     python3 scripts/build_report.py
 
-That writes **`report.html`** in the project folder. Email it, text it, put it
-on a memory stick — she double-clicks it and it opens in her browser.
+That writes two files into the project folder:
 
-It is one self-contained file. It needs no internet, no account, no software,
-and no login. It works on any computer or phone that can open a web page.
+- **`report.pdf`** &mdash; the one to email her. PDFs open on anything, and
+  preview straight inside Gmail on a phone.
+- **`report.html`** &mdash; the same thing as a web page, if you would rather
+  look at it on your own screen. It has a **Save this as a PDF** button.
+
+The PDF is made using Chrome or Edge, whichever is already on the computer, so
+there is nothing extra to install. If neither is found it says so, and you open
+the web page and press the button instead.
 
 Useful options:
 
     python3 scripts/build_report.py --days 30      # only the last month
     python3 scripts/build_report.py --out ~/Desktop/september.html
+    python3 scripts/build_report.py --no-pdf       # web page only
 
 Send her a fresh one whenever it is worth looking at — monthly is plenty.
 
-## What the report shows her
+## What the report shows her (the PDF)
 
 - **Which rental items people opened**, ranked. This is the one that answers
   "what should I get more of".

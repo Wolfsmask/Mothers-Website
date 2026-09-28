@@ -19,6 +19,8 @@ from __future__ import annotations
 import argparse
 import html
 import json
+import shutil
+import subprocess
 import sys
 from collections import Counter
 from datetime import datetime, timedelta, timezone
@@ -218,6 +220,29 @@ def build(rows, days):
               padding: 18px 20px; margin-top: 40px; color: var(--text-secondary); font-size: .93rem; }}
   .reading h3 {{ margin: 0 0 8px; font-size: 1rem; color: var(--text-primary); }}
   .reading li {{ margin-bottom: 6px; }}
+
+  .save {{ margin: 26px 0 0; }}
+  .save button {{
+    font: inherit; font-size: .92rem; font-weight: 600; cursor: pointer;
+    background: var(--bar); color: #fff; border: 0; border-radius: 10px; padding: 11px 18px;
+  }}
+  .save .hint {{ color: var(--text-muted); font-size: .84rem; margin-top: 7px; }}
+
+  /* Printing is also how this becomes a PDF, so make it print properly:
+     force the light palette, drop the interactive bits, keep charts whole. */
+  @media print {{
+    body {{ background: #fff; color: #000; padding: 0; }}
+    .save {{ display: none; }}
+    .tile, .bars, .headline, .reading {{
+      border-color: #ddd; background: #fff;
+      break-inside: avoid; page-break-inside: avoid;
+    }}
+    .bar-fill {{ background: #9a641f !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }}
+    .bar-track {{ background: #eee !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }}
+    h2 {{ break-after: avoid; page-break-after: avoid; }}
+    .table-view {{ display: none; }}
+    a {{ text-decoration: none; color: inherit; }}
+  }}
 </style>
 </head>
 <body>
@@ -247,6 +272,11 @@ def build(rows, days):
 
   {"<h2>Items people started an enquiry about</h2><p class='note'>They clicked through to the contact form from that item. Check the inbox for the ones that were actually sent.</p>" + bars(enq_pairs, total_enq, "enq") + table(enq_pairs, "Rental item") if enq_pairs else ""}
 
+  <div class="save">
+    <button type="button" onclick="window.print()">Save this as a PDF</button>
+    <div class="hint">Opens your printer window &mdash; choose &ldquo;Save as PDF&rdquo; as the printer.</div>
+  </div>
+
   <div class="reading">
     <h3>Reading this properly</h3>
     <ul>
@@ -262,10 +292,58 @@ def build(rows, days):
 """
 
 
+# Browsers that can turn the page into a PDF without anything being installed.
+# Nearly every Windows PC has Edge; nearly every Mac can be given Chrome.
+BROWSERS = [
+    "chrome", "google-chrome", "google-chrome-stable", "chromium", "chromium-browser",
+    "msedge", "microsoft-edge",
+    r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+    r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+    r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+    "/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
+]
+
+
+def find_browser() -> str | None:
+    for candidate in BROWSERS:
+        if Path(candidate).exists():
+            return candidate
+        found = shutil.which(candidate)
+        if found:
+            return found
+    return None
+
+
+def to_pdf(html_path: Path, pdf_path: Path) -> bool:
+    """
+    Print the report to PDF using a browser that is already on the machine.
+    Returns False if there is none, in which case the caller falls back to
+    telling the person to press the button in the report itself.
+    """
+    browser = find_browser()
+    if not browser:
+        return False
+    try:
+        subprocess.run(
+            [browser, "--headless", "--disable-gpu", "--no-sandbox",
+             f"--print-to-pdf={pdf_path}", "--no-pdf-header-footer",
+             html_path.resolve().as_uri()],
+            check=True, timeout=120,
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
+        return pdf_path.exists() and pdf_path.stat().st_size > 1000
+    except Exception:
+        return False
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Build the website report.")
     ap.add_argument("--days", type=int, default=None, help="only the last N days")
     ap.add_argument("--out", default=str(ROOT / "report.html"), help="where to write it")
+    ap.add_argument("--no-pdf", action="store_true",
+                    help="skip the PDF and write only the web page")
     args = ap.parse_args()
 
     rows = load(args.days)
@@ -277,8 +355,22 @@ def main() -> int:
         print("Start the website with:  python3 scripts/serve.py")
     else:
         print(f"Read {len(rows)} recorded events.")
-    print(f"\nReport written to: {out}")
-    print("Double-click it to open, or email it to anyone who wants to see it.\n")
+
+    print(f"\n  Web page:  {out}")
+
+    if args.no_pdf:
+        print("\nEmail that file, or open it and press the Save as PDF button.\n")
+        return 0
+
+    pdf = out.with_suffix(".pdf")
+    if to_pdf(out, pdf):
+        print(f"  PDF:       {pdf}")
+        print("\n  Email the PDF. It opens on any phone or computer, with nothing")
+        print("  to install and nothing to sign in to.\n")
+    else:
+        print("\n  No browser found to make the PDF automatically.")
+        print("  Open the web page above and press the 'Save this as a PDF' button,")
+        print("  then email that.\n")
     return 0
 
 
